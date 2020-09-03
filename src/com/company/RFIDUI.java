@@ -41,7 +41,7 @@ public class RFIDUI
         CardLayout cl = (CardLayout)(cards.getLayout());
         cl.show(cards, NEWSCAN);
 
-        String[] options = {"Neuen Scanner einrichten", "Ausgewählte Logs übertragen", "Alle Logs übertragen"};
+        String[] options = {"Neuen Scanner einrichten", "Ausgewählte Logs übertragen", "Alle Logs übertragen", "Hilfe"};
         JList optionsList = new JList(options);
         optionsList.setFixedCellHeight(40);
         optionsList.setCellRenderer(getRenderer());
@@ -63,6 +63,8 @@ public class RFIDUI
                     case 2:
                         cl.show(cards, SYNCDEL);
                         break;
+                    case 3:
+                        break; //TODO
                     default:
                         cl.show(cards, NEWSCAN);
                         break;
@@ -110,7 +112,7 @@ public class RFIDUI
                     "\n Für mehr Informationen siehe \"Hilfe\".");
         }
         newestScannerText.setEditable(false);
-        newestScannerText.setSize(490, 90);
+        //newestScannerText.setSize(490, 90);
         Color veryLightGrey = new Color(238,238,238);
         newestScannerText.setBackground(veryLightGrey);
 
@@ -127,35 +129,40 @@ public class RFIDUI
         scannerList.setFixedCellHeight(25);
         scannerList.setFixedCellWidth(490);
         scannerList.setCellRenderer(getRendererScanners());
-        scannerList.setSelectedIndex(0);
 
         JPanel listPanel = new JPanel();
         listPanel.add(scannerList);
-        listPanel.setSize(490, 300);
+        listPanel.setSize(new Dimension(495, 250));
 
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BorderLayout());
         topPanel.add(newestScannerText, BorderLayout.NORTH);
-        //topPanel.add(new JToolBar.Separator());
-        topPanel.setSize(490, 100);
-        topPanel.add(Box.createVerticalStrut(5));
+        topPanel.setMaximumSize(new Dimension(495, 100));
         topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         JPanel midPanel = new JPanel();
         midPanel.setLayout(new BorderLayout());
-        midPanel.add(addScannerText, BorderLayout.NORTH);
-        //midPanel.add(new JToolBar.Separator());
-        midPanel.setSize(490, 50);
-        midPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+        JTextPane addScannerExplanation = new JTextPane();
+        addScannerExplanation.setText("Um einen neuen Scanner hinzuzufügen klicken Sie auf \"Durchsuchen\" und wählen Sie den Scanner aus. \n Alternativ können Sie " +
+                "aus der Liste unten einen bereits bekannten Scanner durch Klicken auswählen.");
+        addScannerExplanation.setMargin(new Insets(5,5,5,5));
+        addScannerExplanation.setEditable(false);
+        addScannerExplanation.setBackground(veryLightGrey);
+        midPanel.add(addScannerExplanation, BorderLayout.NORTH);
+
+        midPanel.add(addScannerText, BorderLayout.CENTER);
+
+        midPanel.setMaximumSize(new Dimension(495, 100));
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
         bottomPanel.add(listPanel, BorderLayout.NORTH);
 
         newscan.add(topPanel);
-        newscan.add(Box.createRigidArea(new Dimension(0,0)));
+        //newscan.add(Box.createRigidArea(new Dimension(490,100)));
         newscan.add(midPanel);
-        newscan.add(Box.createRigidArea(new Dimension(0,0)));
+        //newscan.add(Box.createRigidArea(new Dimension(490,100)));
         newscan.add(listPanel);
 
         newscan.setSize(new Dimension(500,450));
