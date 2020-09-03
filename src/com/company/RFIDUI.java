@@ -47,7 +47,6 @@ public class RFIDUI
         optionsList.setCellRenderer(getRenderer());
         optionsList.setSelectedIndex(0);
         optionsList.addMouseListener(new MouseAdapter(){
-            //TODO center panel w card layout
             @Override
             public void mouseClicked(MouseEvent e) {
                 int index = optionsList.getSelectedIndex();
@@ -71,7 +70,6 @@ public class RFIDUI
                 }
             }
         });
-        //help case TODO
 
         JPanel listPanel = new JPanel();
         listPanel.setSize(new Dimension(250,450));
@@ -88,13 +86,11 @@ public class RFIDUI
 
     private JPanel newScan()
     {
-        //explanations TODO
-
         JPanel newscan = new JPanel();
         newscan.setLayout(new BoxLayout(newscan, BoxLayout.Y_AXIS));
 
-        //show current scanner in text field (top of props)
-
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout());
         JTextPane newestScannerText = new JTextPane();
         newestScannerText.setMargin(new Insets(5,5,5,5));
 
@@ -115,34 +111,15 @@ public class RFIDUI
         //newestScannerText.setSize(490, 90);
         Color veryLightGrey = new Color(238,238,238);
         newestScannerText.setBackground(veryLightGrey);
-
-        //text field for new scanner w add button (how to windows lookup java TODO)
-
-        JTextField addScannerText = new JTextField();
-        addScannerText.setSize(350, 27);
-        addScannerText.setPreferredSize(new Dimension(350, 27));
-
-        //list of old scanners + delete option + choose option TODO
-
-        ArrayList scanners = main.getPropAsList();
-
-        JList scannerList = new JList(scanners.toArray());
-        scannerList.setFixedCellHeight(25);
-        scannerList.setFixedCellWidth(490);
-        scannerList.setCellRenderer(getRendererScanners());
-
-        JPanel listPanel = new JPanel();
-        listPanel.add(scannerList);
-        listPanel.setSize(new Dimension(495, 250));
-
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BorderLayout());
         topPanel.add(newestScannerText, BorderLayout.NORTH);
         topPanel.setMaximumSize(new Dimension(495, 100));
         topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         JPanel midPanel = new JPanel();
         midPanel.setLayout(new BorderLayout());
+        JTextField addScannerText = new JTextField();
+        addScannerText.setSize(350, 27);
+        addScannerText.setPreferredSize(new Dimension(350, 27));
         JTextPane addScannerExplanation = new JTextPane();
         addScannerExplanation.setText("Um einen neuen Scanner hinzuzufügen klicken Sie auf \"Durchsuchen\" und wählen Sie den Scanner aus. \n Alternativ können Sie " +
                 "aus der Liste unten einen bereits bekannten Scanner durch Klicken auswählen.");
@@ -153,7 +130,14 @@ public class RFIDUI
         JPanel flowPanel = new JPanel();
         flowPanel.setLayout(new FlowLayout());
         flowPanel.add(addScannerText);
-        JButton search = new JButton("Durchsuchen"); //TODO clicker
+        JButton search = new JButton("Durchsuchen");
+        search.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //TODO clicker
+                System.out.println("Durchsuchen");
+            }
+    });
         flowPanel.add(search);
         flowPanel.setMaximumSize(new Dimension(495, 30));
         midPanel.add(flowPanel, BorderLayout.CENTER);
@@ -162,14 +146,48 @@ public class RFIDUI
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        ArrayList scanners = main.getPropAsList();
+
+        JList scannerList = new JList(scanners.toArray());
+        scannerList.setFixedCellHeight(25);
+        scannerList.setFixedCellWidth(450);
+        scannerList.setCellRenderer(getRendererScanners());
+        scannerList.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                System.out.println("scannerList"); //TODO
+            }
+        });
+        ArrayList temp = new ArrayList();
+        for(int i = 0; i < scannerList.getModel().getSize(); i++)
+        {
+            temp.add("X"); //TODO
+        }
+        JList scannerListClose = new JList(temp.toArray());
+        scannerListClose.setFixedCellHeight(25);
+        scannerListClose.setFixedCellWidth(25);
+        scannerListClose.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                System.out.println("scannerListClose"); //TODO
+            }
+        });
+        JPanel listPanel = new JPanel();
+        listPanel.add(scannerList, BorderLayout.WEST);
+        listPanel.add(scannerListClose, BorderLayout.EAST);
+        listPanel.setSize(new Dimension(495, 250));
+        JScrollPane scrollFrame = new JScrollPane(listPanel);
+        scrollFrame.setPreferredSize(new Dimension(495,250));
+        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JTextPane scannerListExplanation = new JTextPane();
         scannerListExplanation.setText("Liste bereits bekannter Scanner (zum Auswählen klicken, zum Löschen das X auswählen)"); //TODO clicker delete
         scannerListExplanation.setMargin(new Insets(5,5,5,5));
         scannerListExplanation.setEditable(false);
         scannerListExplanation.setBackground(veryLightGrey);
         bottomPanel.add(scannerListExplanation, BorderLayout.NORTH);
-        bottomPanel.add(listPanel, BorderLayout.CENTER);
+        bottomPanel.add(scrollFrame, BorderLayout.CENTER);
         bottomPanel.setMaximumSize(new Dimension(495,225));
 
         newscan.add(topPanel);
@@ -190,10 +208,11 @@ public class RFIDUI
         JPanel syncdelPart = new JPanel();
         syncdelPart.setLayout(new BoxLayout(syncdelPart, BoxLayout.PAGE_AXIS));
 
-        JTextPane placeholder = new JTextPane();
-        placeholder.setText("placeholder");
+        JTextPane explanation = new JTextPane();
+        explanation.setText("Wählen Sie unten alle Logs aus, die Sie kopieren wollen.");
+        explanation.setMaximumSize(new Dimension(495,0));
 
-        syncdelPart.add(placeholder);
+        syncdelPart.add(explanation);
         syncdelPart.setPreferredSize(new Dimension(500,450));
         return syncdelPart;
     }
