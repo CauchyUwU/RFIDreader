@@ -119,7 +119,8 @@ public class RFIDUI
         //text field for new scanner w add button (how to windows lookup java TODO)
 
         JTextField addScannerText = new JTextField();
-        addScannerText.setSize(490, 40);
+        addScannerText.setSize(350, 27);
+        addScannerText.setPreferredSize(new Dimension(350, 27));
 
         //list of old scanners + delete option + choose option TODO
 
@@ -142,7 +143,6 @@ public class RFIDUI
 
         JPanel midPanel = new JPanel();
         midPanel.setLayout(new BorderLayout());
-
         JTextPane addScannerExplanation = new JTextPane();
         addScannerExplanation.setText("Um einen neuen Scanner hinzuzufügen klicken Sie auf \"Durchsuchen\" und wählen Sie den Scanner aus. \n Alternativ können Sie " +
                 "aus der Liste unten einen bereits bekannten Scanner durch Klicken auswählen.");
@@ -150,20 +150,33 @@ public class RFIDUI
         addScannerExplanation.setEditable(false);
         addScannerExplanation.setBackground(veryLightGrey);
         midPanel.add(addScannerExplanation, BorderLayout.NORTH);
-
-        midPanel.add(addScannerText, BorderLayout.CENTER);
-
-        midPanel.setMaximumSize(new Dimension(495, 100));
+        JPanel flowPanel = new JPanel();
+        flowPanel.setLayout(new FlowLayout());
+        flowPanel.add(addScannerText);
+        JButton search = new JButton("Durchsuchen"); //TODO clicker
+        flowPanel.add(search);
+        flowPanel.setMaximumSize(new Dimension(495, 30));
+        midPanel.add(flowPanel, BorderLayout.CENTER);
+        midPanel.setMaximumSize(new Dimension(495, 125));
+        midPanel.add(new JSeparator(JSeparator.HORIZONTAL), BorderLayout.SOUTH);
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        bottomPanel.add(listPanel, BorderLayout.NORTH);
+        topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+        JTextPane scannerListExplanation = new JTextPane();
+        scannerListExplanation.setText("Liste bereits bekannter Scanner (zum Auswählen klicken, zum Löschen das X auswählen)"); //TODO clicker delete
+        scannerListExplanation.setMargin(new Insets(5,5,5,5));
+        scannerListExplanation.setEditable(false);
+        scannerListExplanation.setBackground(veryLightGrey);
+        bottomPanel.add(scannerListExplanation, BorderLayout.NORTH);
+        bottomPanel.add(listPanel, BorderLayout.CENTER);
+        bottomPanel.setMaximumSize(new Dimension(495,225));
 
         newscan.add(topPanel);
         //newscan.add(Box.createRigidArea(new Dimension(490,100)));
         newscan.add(midPanel);
         //newscan.add(Box.createRigidArea(new Dimension(490,100)));
-        newscan.add(listPanel);
+        newscan.add(bottomPanel);
 
         newscan.setSize(new Dimension(500,450));
         return newscan;
