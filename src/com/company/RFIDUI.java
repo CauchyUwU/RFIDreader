@@ -89,13 +89,12 @@ public class RFIDUI
         //explanations TODO
 
         JPanel newscan = new JPanel();
-        newscan.setLayout(new BoxLayout(newscan, BoxLayout.PAGE_AXIS));
+        newscan.setLayout(new BoxLayout(newscan, BoxLayout.Y_AXIS));
 
         //show current scanner in text field (top of props)
 
         JTextPane newestScannerText = new JTextPane();
         newestScannerText.setMargin(new Insets(5,5,5,5));
-        newestScannerText.setSize(500, 100);
 
         int newest = Integer.parseInt(main.getProps().getProperty("count"));
         if(newest >= 0)
@@ -111,30 +110,55 @@ public class RFIDUI
                     "\n Für mehr Informationen siehe \"Hilfe\".");
         }
         newestScannerText.setEditable(false);
+        newestScannerText.setSize(490, 90);
+        Color veryLightGrey = new Color(238,238,238);
+        newestScannerText.setBackground(veryLightGrey);
 
         //text field for new scanner w add button (how to windows lookup java TODO)
 
         JTextField addScannerText = new JTextField();
-        addScannerText.setSize(500, 50);
+        addScannerText.setSize(490, 40);
 
         //list of old scanners + delete option + choose option TODO
 
         ArrayList scanners = main.getPropAsList();
 
         JList scannerList = new JList(scanners.toArray());
-        scannerList.setFixedCellHeight(40);
-        scannerList.setCellRenderer(getRenderer());
+        scannerList.setFixedCellHeight(25);
+        scannerList.setFixedCellWidth(490);
+        scannerList.setCellRenderer(getRendererScanners());
         scannerList.setSelectedIndex(0);
 
         JPanel listPanel = new JPanel();
         listPanel.add(scannerList);
-        listPanel.setSize(400, 300);
+        listPanel.setSize(490, 300);
 
-        newscan.add(newestScannerText);
-        newscan.add(addScannerText);
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BorderLayout());
+        topPanel.add(newestScannerText, BorderLayout.NORTH);
+        //topPanel.add(new JToolBar.Separator());
+        topPanel.setSize(490, 100);
+        topPanel.add(Box.createVerticalStrut(5));
+        topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+        JPanel midPanel = new JPanel();
+        midPanel.setLayout(new BorderLayout());
+        midPanel.add(addScannerText, BorderLayout.NORTH);
+        //midPanel.add(new JToolBar.Separator());
+        midPanel.setSize(490, 50);
+        midPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BorderLayout());
+        bottomPanel.add(listPanel, BorderLayout.NORTH);
+
+        newscan.add(topPanel);
+        newscan.add(Box.createRigidArea(new Dimension(0,0)));
+        newscan.add(midPanel);
+        newscan.add(Box.createRigidArea(new Dimension(0,0)));
         newscan.add(listPanel);
 
-        newscan.setPreferredSize(new Dimension(500,450));
+        newscan.setSize(new Dimension(500,450));
         return newscan;
     }
 
@@ -175,6 +199,19 @@ public class RFIDUI
                                                           boolean cellHasFocus) {
                 JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,cellHasFocus);
                 listCellRendererComponent.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0,Color.GRAY));
+                return listCellRendererComponent;
+            }
+        };
+    }
+
+    private ListCellRenderer<? super String> getRendererScanners() {
+        return new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list,
+                                                          Object value, int index, boolean isSelected,
+                                                          boolean cellHasFocus) {
+                JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,cellHasFocus);
+                listCellRendererComponent.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,Color.GRAY));
                 return listCellRendererComponent;
             }
         };
