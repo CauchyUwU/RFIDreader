@@ -15,6 +15,7 @@ public class RFIDUI
     final static String NEWSCAN = "Neuen Scanner einrichten";
     final static String SYNCDELPART = "Ausgewählte Logs übertragen";
     final static String SYNCDEL = "Alle Logs übertragen";
+    private Color veryLightGrey = new Color(238,238,238);
 
     public RFIDUI(Main main)
     {
@@ -109,7 +110,6 @@ public class RFIDUI
         }
         newestScannerText.setEditable(false);
         //newestScannerText.setSize(490, 90);
-        Color veryLightGrey = new Color(238,238,238);
         newestScannerText.setBackground(veryLightGrey);
         topPanel.add(newestScannerText, BorderLayout.NORTH);
         topPanel.setMaximumSize(new Dimension(495, 100));
@@ -182,7 +182,7 @@ public class RFIDUI
         scrollFrame.setPreferredSize(new Dimension(495,250));
         scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JTextPane scannerListExplanation = new JTextPane();
-        scannerListExplanation.setText("Liste bereits bekannter Scanner (zum Auswählen klicken, zum Löschen das X auswählen)"); //TODO clicker delete
+        scannerListExplanation.setText("Liste bereits bekannter Scanner (zum Auswählen klicken, zum Löschen das X auswählen)");
         scannerListExplanation.setMargin(new Insets(5,5,5,5));
         scannerListExplanation.setEditable(false);
         scannerListExplanation.setBackground(veryLightGrey);
@@ -206,13 +206,79 @@ public class RFIDUI
         //copy some (chosen) values from clipboard and delete save file/clipboard
         //maybe save this in file?
         JPanel syncdelPart = new JPanel();
-        syncdelPart.setLayout(new BoxLayout(syncdelPart, BoxLayout.PAGE_AXIS));
+        syncdelPart.setLayout(new BoxLayout(syncdelPart, BoxLayout.Y_AXIS));
 
         JTextPane explanation = new JTextPane();
-        explanation.setText("Wählen Sie unten alle Logs aus, die Sie kopieren wollen.");
-        explanation.setMaximumSize(new Dimension(495,0));
+        explanation.setText("Wählen Sie unten alle Logs aus, die Sie kopieren wollen. \nAchtung: die kopierten Logs werden vom " +
+                "Scanner gelöscht. Trennen Sie wärend des Kopierens nicht die Verbindung zum Scanner, da sonst Daten verloren gehen " +
+                "oder beschädigt werden können!");
+        explanation.setMinimumSize(new Dimension(495,75));
+        explanation.setMaximumSize(new Dimension(495,75));
+        explanation.setPreferredSize(new Dimension(495,75));
+        explanation.setBackground(veryLightGrey);
+
+        JTextPane labelList = new JTextPane();
+        labelList.setText("Liste der aktuellen Logs:");
+        labelList.setMinimumSize(new Dimension(495,25));
+        labelList.setMaximumSize(new Dimension(495,25));
+        labelList.setPreferredSize(new Dimension(495,25));
+        labelList.setBackground(veryLightGrey);
+
+        ArrayList logs = new ArrayList();
+        logs.add("test"); //TODO get from path
+        logs.add("test2");
+
+        JList logsList = new JList(logs.toArray());
+        logsList.setFixedCellHeight(25);
+        logsList.setFixedCellWidth(480);
+        logsList.setCellRenderer(getRendererScanners());
+        logsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        logsList.setSelectionModel(new DefaultListSelectionModel() {
+            private static final long serialVersionUID = 1L;
+
+            boolean gestureStarted = false;
+
+            @Override
+            public void setSelectionInterval(int index0, int index1) {
+                if(!gestureStarted){
+                    if (isSelectedIndex(index0)) {
+                        super.removeSelectionInterval(index0, index1);
+                    } else {
+                        super.addSelectionInterval(index0, index1);
+                    }
+                }
+                gestureStarted = true;
+            }
+
+            @Override
+            public void setValueIsAdjusting(boolean isAdjusting) {
+                if (isAdjusting == false) {
+                    gestureStarted = false;
+                }
+            }
+
+        });
+        JScrollPane scrollFrame = new JScrollPane(logsList);
+        scrollFrame.setMinimumSize(new Dimension(495,200));
+        scrollFrame.setMaximumSize(new Dimension(495,200));
+        scrollFrame.setPreferredSize(new Dimension(495,200));
+        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JButton confirm = new JButton("Kopieren beginnen");
+        confirm.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                System.out.println(Arrays.toString(logsList.getSelectedValuesList().toArray())); //TODO
+            }
+        });
+        confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         syncdelPart.add(explanation);
+        syncdelPart.add(labelList);
+        syncdelPart.add(scrollFrame);
+        syncdelPart.add(confirm);
+
         syncdelPart.setPreferredSize(new Dimension(500,450));
         return syncdelPart;
     }
