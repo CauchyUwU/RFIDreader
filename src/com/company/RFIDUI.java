@@ -264,11 +264,16 @@ public class RFIDUI
         scrollFrame.setPreferredSize(new Dimension(495,200));
         scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+        JProgressBar progBar = new JProgressBar();
+        progBar.setValue(0);
+        progBar.setStringPainted(true);
+
         JButton confirm = new JButton("Kopieren beginnen");
         confirm.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e)
             {
+                copy(progBar, logsList.getSelectedValuesList());
                 System.out.println(Arrays.toString(logsList.getSelectedValuesList().toArray())); //TODO
             }
         });
@@ -278,6 +283,8 @@ public class RFIDUI
         syncdelPart.add(labelList);
         syncdelPart.add(scrollFrame);
         syncdelPart.add(confirm);
+        syncdelPart.add(Box.createVerticalStrut(10));
+        syncdelPart.add(progBar);
 
         syncdelPart.setPreferredSize(new Dimension(500,450));
         return syncdelPart;
@@ -294,6 +301,18 @@ public class RFIDUI
         syncdel.add(placeholder);
         syncdel.setPreferredSize(new Dimension(500,450));
         return syncdel;
+    }
+
+    private boolean copy(JProgressBar prog, List toCopy)
+    {
+        //TODO actually copy & not return true always
+        prog.setValue(0);
+        int len = toCopy.size();
+        for (int i = 0; i < len; i++)
+        {
+            prog.setValue(prog.getValue() + 100/len);
+        }
+        return true;
     }
 
     private ListCellRenderer<? super String> getRenderer() {
