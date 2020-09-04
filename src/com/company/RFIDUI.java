@@ -1,10 +1,12 @@
 package com.company;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -150,53 +152,14 @@ public class RFIDUI
 
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BorderLayout());
-        ArrayList scanners = main.getPropAsList();
-
-        JList scannerList = new JList(scanners.toArray());
-        scannerList.setFixedCellHeight(25);
-        scannerList.setFixedCellWidth(450);
-        scannerList.setCellRenderer(getRendererScanners());
-        scannerList.addMouseListener(new MouseAdapter(){
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-                System.out.println("scannerList"); //TODO
-            }
-        });
-        ArrayList temp = new ArrayList();
-        JTextPane close = new JTextPane();
-        close.setText("X");
-        close.setForeground(Color.WHITE);
-        close.setBackground(Color.RED);
-        close.setSize(25,25);
-        for(int i = 0; i < scannerList.getModel().getSize(); i++)
-        {
-            temp.add(close); //TODO
-        }
-        JList scannerListClose = new JList(temp.toArray());
-        scannerListClose.setFixedCellHeight(25);
-        scannerListClose.setFixedCellWidth(25);
-        scannerListClose.addMouseListener(new MouseAdapter(){
-            @Override
-            public void mouseClicked(MouseEvent e)
-            {
-                System.out.println("scannerListClose"); //TODO
-            }
-        });
-        JPanel listPanel = new JPanel();
-        listPanel.add(scannerList, BorderLayout.WEST);
-        listPanel.add(scannerListClose, BorderLayout.EAST);
-        listPanel.setSize(new Dimension(495, 250));
-        JScrollPane scrollFrame = new JScrollPane(listPanel);
-        scrollFrame.setPreferredSize(new Dimension(495,250));
-        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         JTextPane scannerListExplanation = new JTextPane();
         scannerListExplanation.setText("Liste bereits bekannter Scanner (zum Auswählen klicken, zum Löschen das X auswählen)");
         scannerListExplanation.setMargin(new Insets(5,5,5,5));
         scannerListExplanation.setEditable(false);
         scannerListExplanation.setBackground(veryLightGrey);
         bottomPanel.add(scannerListExplanation, BorderLayout.NORTH);
-        bottomPanel.add(scrollFrame, BorderLayout.CENTER);
+        JScrollPane scannersList = scannerListSetup();
+        bottomPanel.add(scannersList, BorderLayout.CENTER);
         bottomPanel.setMaximumSize(new Dimension(495,225));
 
         newscan.add(topPanel);
@@ -439,5 +402,61 @@ public class RFIDUI
         };
     }
 
+    private JScrollPane scannerListSetup()
+    {
+        ArrayList scanners = main.getPropAsList();
+
+        JList scannerList = new JList(scanners.toArray());
+        scannerList.setFixedCellHeight(25);
+        scannerList.setFixedCellWidth(440);
+        scannerList.setCellRenderer(getRendererScanners());
+        scannerList.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                System.out.println("scannerList"); //TODO
+            }
+        });
+        JList scannerListClose = new JList();
+        scannerListClose.setCellRenderer(new ImageListCellRenderer());
+
+        JTextPane text = new JTextPane();
+        text.setText("X");
+        text.setBackground(Color.RED);
+        text.setForeground(Color.WHITE);
+        text.setFont(new Font("Arial", Font.BOLD, 8));
+        text.setAlignmentX(100);
+        JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        closePanel.add(text);
+        closePanel.setBackground(veryLightGrey);
+
+        Object[] panels = new Object[scannerList.getModel().getSize()];
+        for (int i = 0; i < scannerList.getModel().getSize(); i++)
+        {
+            panels[i] = closePanel;
+        }
+
+// tell the jlist to use the panel array for its data
+        scannerListClose.setListData(panels);
+        scannerListClose.setBackground(veryLightGrey);
+        //TODO custom renderer
+        scannerListClose.setFixedCellHeight(25);
+        scannerListClose.setFixedCellWidth(25);
+        scannerListClose.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                System.out.println("scannerListClose"); //TODO
+            }
+        });
+        JPanel listPanel = new JPanel();
+        listPanel.add(scannerList, BorderLayout.WEST);
+        listPanel.add(scannerListClose, BorderLayout.EAST);
+        listPanel.setSize(new Dimension(495, 250));
+        JScrollPane scrollFrame = new JScrollPane(listPanel);
+        scrollFrame.setPreferredSize(new Dimension(495,250));
+        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        return scrollFrame;
+    }
 
 }
