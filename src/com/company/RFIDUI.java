@@ -164,9 +164,14 @@ public class RFIDUI
             }
         });
         ArrayList temp = new ArrayList();
+        JTextPane close = new JTextPane();
+        close.setText("X");
+        close.setForeground(Color.WHITE);
+        close.setBackground(Color.RED);
+        close.setSize(25,25);
         for(int i = 0; i < scannerList.getModel().getSize(); i++)
         {
-            temp.add("X"); //TODO
+            temp.add(close); //TODO
         }
         JList scannerListClose = new JList(temp.toArray());
         scannerListClose.setFixedCellHeight(25);
