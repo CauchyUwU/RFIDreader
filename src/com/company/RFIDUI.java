@@ -15,6 +15,7 @@ public class RFIDUI
     final static String NEWSCAN = "Neuen Scanner einrichten";
     final static String SYNCDELPART = "Ausgewählte Logs übertragen";
     final static String SYNCDEL = "Alle Logs übertragen";
+    final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
 
     public RFIDUI(Main main)
@@ -37,6 +38,8 @@ public class RFIDUI
         cards.add(card1, SYNCDELPART);
         JPanel card2 = synchroDelete();
         cards.add(card2, SYNCDEL);
+        JPanel card3 = help();
+        cards.add(card3, HELP);
 
         frame.getContentPane().add(cards, BorderLayout.CENTER); //add return to frame
         CardLayout cl = (CardLayout)(cards.getLayout());
@@ -64,7 +67,8 @@ public class RFIDUI
                         cl.show(cards, SYNCDEL);
                         break;
                     case 3:
-                        break; //TODO
+                        cl.show(cards, HELP);
+                        break;
                     default:
                         cl.show(cards, NEWSCAN);
                         break;
@@ -216,6 +220,7 @@ public class RFIDUI
         explanation.setMaximumSize(new Dimension(495,75));
         explanation.setPreferredSize(new Dimension(495,75));
         explanation.setBackground(veryLightGrey);
+        explanation.setEditable(false);
 
         JTextPane labelList = new JTextPane();
         labelList.setText("Liste der aktuellen Logs:");
@@ -223,6 +228,7 @@ public class RFIDUI
         labelList.setMaximumSize(new Dimension(495,25));
         labelList.setPreferredSize(new Dimension(495,25));
         labelList.setBackground(veryLightGrey);
+        labelList.setEditable(false);
 
         ArrayList logs = new ArrayList();
         logs.add("test"); //TODO get from path
@@ -293,19 +299,106 @@ public class RFIDUI
     private JPanel synchroDelete()
     {
         JPanel syncdel = new JPanel();
-        syncdel.setLayout(new BoxLayout(syncdel, BoxLayout.PAGE_AXIS));
+        syncdel.setLayout(new BoxLayout(syncdel, BoxLayout.Y_AXIS));
 
-        JTextPane placeholder = new JTextPane();
-        placeholder.setText("placeholder");
+        JTextPane explanation = new JTextPane();
+        explanation.setText("Der Button \"Kopieren\" kopiert alle unten angezeigten Logs. \nAchtung: die kopierten Logs werden vom " +
+                "Scanner gelöscht. Trennen Sie wärend des Kopierens nicht die Verbindung zum Scanner, da sonst Daten verloren gehen " +
+                "oder beschädigt werden können!");
+        explanation.setMinimumSize(new Dimension(495,75));
+        explanation.setMaximumSize(new Dimension(495,75));
+        explanation.setPreferredSize(new Dimension(495,75));
+        explanation.setBackground(veryLightGrey);
+        explanation.setEditable(false);
 
-        syncdel.add(placeholder);
+        JTextPane labelList = new JTextPane();
+        labelList.setText("Liste der aktuellen Logs:");
+        labelList.setMinimumSize(new Dimension(495,25));
+        labelList.setMaximumSize(new Dimension(495,25));
+        labelList.setPreferredSize(new Dimension(495,25));
+        labelList.setBackground(veryLightGrey);
+        labelList.setEditable(false);
+
+        ArrayList logs = new ArrayList();
+        logs.add("test"); //TODO get from path
+        logs.add("test2");
+
+        JList logsList = new JList(logs.toArray());
+        logsList.setFixedCellHeight(25);
+        logsList.setFixedCellWidth(480);
+        logsList.setCellRenderer(getRendererScanners());
+        logsList.setSelectionModel(new DefaultListSelectionModel() {
+            public void setSelectionInterval(int i, int j) {
+                super.setSelectionInterval(-1,-1);
+            }
+            public void addSelectionInterval(int i, int j) {
+                    super.addSelectionInterval(-1, -1);
+            }
+            public void setLeadSelectionIndex(int i) {
+                super.setLeadSelectionIndex(-1);
+            }
+            public void setAnchorSelectionIndex(int i) {
+                super.setAnchorSelectionIndex(-1);
+            }
+        });
+        JScrollPane scrollFrame = new JScrollPane(logsList);
+        scrollFrame.setMinimumSize(new Dimension(495,200));
+        scrollFrame.setMaximumSize(new Dimension(495,200));
+        scrollFrame.setPreferredSize(new Dimension(495,200));
+        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        JProgressBar progBar = new JProgressBar();
+        progBar.setValue(0);
+        progBar.setStringPainted(true);
+
+        JButton confirm = new JButton("Kopieren beginnen");
+        confirm.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e)
+            {
+                ArrayList temp = new ArrayList();
+                for(int i = 0; i < logsList.getModel().getSize(); i++)
+                {
+                    temp.add(logsList.getModel().getElementAt(i));
+                }
+                copy(progBar, temp);
+                System.out.println(Arrays.toString(temp.toArray())); //TODO
+            }
+        });
+        confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        syncdel.add(explanation);
+        syncdel.add(labelList);
+        syncdel.add(scrollFrame);
+        syncdel.add(confirm);
+        syncdel.add(Box.createVerticalStrut(10));
+        syncdel.add(progBar);
+
         syncdel.setPreferredSize(new Dimension(500,450));
         return syncdel;
     }
 
+    private JPanel help() //TODO
+    {
+        JPanel help = new JPanel();
+        help.setLayout(new BoxLayout(help, BoxLayout.Y_AXIS));
+
+        JTextPane placeholder = new JTextPane();
+        placeholder.setText("Placeholder");
+        //placeholder.setMinimumSize(new Dimension(495,75));
+        //placeholder.setMaximumSize(new Dimension(495,75));
+        //placeholder.setPreferredSize(new Dimension(495,75));
+        placeholder.setBackground(veryLightGrey);
+        placeholder.setEditable(false);
+
+        help.add(placeholder);
+
+        return help;
+    }
+
     private boolean copy(JProgressBar prog, List toCopy)
     {
-        //TODO actually copy & not return true always
+        //TODO actually copy & not return true always (thread)
         prog.setValue(0);
         int len = toCopy.size();
         for (int i = 0; i < len; i++)
@@ -340,4 +433,6 @@ public class RFIDUI
             }
         };
     }
+
+
 }
