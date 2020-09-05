@@ -7,9 +7,13 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static java.lang.Runtime.getRuntime;
 
 public class RFIDUI
 {
@@ -140,7 +144,7 @@ public class RFIDUI
         search.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                //TODO clicker
+                searchButtonClicked();
                 System.out.println("Durchsuchen");
             }
     });
@@ -457,6 +461,22 @@ public class RFIDUI
         scrollFrame.setPreferredSize(new Dimension(495,250));
         scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         return scrollFrame;
+    }
+
+    private void searchButtonClicked() //TODO thread
+    {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Scanner-Pfad auswählen");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            main.addNewScanner(chooser.getSelectedFile());
+            System.out.println("getSelectedFile() : "
+                    +  chooser.getSelectedFile());
+        }
+        else {
+            System.out.println("No Selection ");
+        }
     }
 
 }

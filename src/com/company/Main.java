@@ -1,9 +1,6 @@
 package com.company;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -19,7 +16,7 @@ public class Main {
     public Main()
     {
         props = new Properties();
-        String propFileName = "scanners.properties";
+        String propFileName = "resources/scanners.properties";
         try {
             inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
             if (inputStream != null) {
@@ -36,6 +33,7 @@ public class Main {
 
     public static void main(String[] args) {
         Main m = new Main();
+        //m.resetProps();
         m.getPropAsList();
         RFIDUI gui = new RFIDUI(m);
         /*
@@ -48,7 +46,7 @@ public class Main {
     public ArrayList getPropAsList()
     {
         ArrayList scanners = new ArrayList();
-        int count = Integer.valueOf(props.getProperty("count"));
+        int count = Integer.parseInt(props.getProperty("count"));
         for (int i = 0; i <= count; i++)
         {
             scanners.add(props.getProperty(String.valueOf(i)));
@@ -60,7 +58,43 @@ public class Main {
         return props;
     }
 
-    public void setProps(Properties props) {
-        this.props = props;
+    public void resetProps() {
+        try {
+            String propertiesFilePath = ("resources/scanners.properties");
+            FileInputStream fis = new FileInputStream(propertiesFilePath);
+            props.load(fis);
+
+            props.put("count", "-1");
+
+            FileOutputStream fos = new FileOutputStream(propertiesFilePath);
+            props.store(fos,null);
+            System.out.println("SUCCESS");
+        }
+        catch(Exception e) {
+            System.out.println("FAILED");
+        }
+    }
+
+    public void addNewScanner(File selectedFile)
+    {
+        int count = Integer.parseInt(props.getProperty("count")) + 1;
+
+        try {
+            String propertiesFilePath = ("resources/scanners.properties");
+            FileInputStream fis = new FileInputStream(propertiesFilePath);
+            props.load(fis);
+
+            props.setProperty("count", String.valueOf(count));
+            props.setProperty(String.valueOf(count), selectedFile.toString());
+
+            FileOutputStream fos = new FileOutputStream(propertiesFilePath);
+            props.store(fos,null);
+            System.out.println("SUCCESS");
+            fis.close();
+            fos.close();
+        }
+        catch(Exception e) {
+            System.out.println("FAILED");
+        }
     }
 }
