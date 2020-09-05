@@ -144,7 +144,7 @@ public class RFIDUI
         search.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e) {
-                searchButtonClicked();
+                searchButtonClicked(newscan);
                 System.out.println("Durchsuchen");
             }
     });
@@ -463,7 +463,7 @@ public class RFIDUI
         return scrollFrame;
     }
 
-    private void searchButtonClicked() //TODO thread
+    private void searchButtonClicked(JPanel parent) //TODO thread
     {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Scanner-Pfad auswählen");
@@ -477,6 +477,8 @@ public class RFIDUI
         else {
             System.out.println("No Selection ");
         }
+        newScan();
+        parent.revalidate();
     }
 
 }
