@@ -228,7 +228,8 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                DefaultListModel model = delButtonClicked(newscan, scannerListClose.getSelectedIndex());
+                int index = Integer.parseInt(main.getProps().getProperty("count")) - scannerListClose.getSelectedIndex();
+                DefaultListModel model = delButtonClicked(newscan, index);
                 scannerList.setModel(model);
                 Object[] panels = new Object[scannerList.getModel().getSize()];
                 for (int i = 0; i < scannerList.getModel().getSize(); i++)
@@ -236,7 +237,25 @@ public class RFIDUI
                     panels[i] = closePanel;
                 }
 
-                scannerListClose.setListData(panels); //TODO
+                scannerListClose.setListData(panels);
+                if(newest > Integer.parseInt(main.getProps().getProperty("count")));
+                {
+                    newest = Integer.parseInt(main.getProps().getProperty("count"));
+                }
+                if(newest >= 0)
+                {
+                    String newestScanner = main.getProps().getProperty(String.valueOf(newest));
+                    newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                    addScannerText.setText(newestScanner);
+                }
+                else
+                {
+                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                    addScannerText.setText("");
+                }
             }
         });
         JPanel listPanel = new JPanel();
@@ -536,7 +555,7 @@ public class RFIDUI
         return model;
     }
 
-    private DefaultListModel delButtonClicked(JPanel newscan, int selectedIndex)
+    private DefaultListModel delButtonClicked(JPanel newscan, int selectedIndex) //TODO incorrect if scanner neq 0 is deleted
     {
         DefaultListModel model = new DefaultListModel();
         DelInsThread thread = new DelInsThread(ThreadState.DELETE, main, model, this, selectedIndex);
