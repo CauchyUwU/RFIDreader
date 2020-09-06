@@ -225,7 +225,6 @@ public class RFIDUI
                     panels[i] = closePanel;
                 }
 
-// tell the jlist to use the panel array for its data
                 scannerListClose.setListData(panels);
             }
         });
@@ -490,8 +489,18 @@ public class RFIDUI
         else {
             System.out.println("No Selection ");
         }
+
         DefaultListModel model = new DefaultListModel();
-        model.addAll(main.getPropAsList());
+        DelInsThread thread = new DelInsThread(ThreadState.COPY, main, model, this);
+        thread.start();
+        try {
+            thread.join();
+            model = thread.getRet();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            model.add(0, "Fehler beim Laden der Liste.");
+        }
+        //model.addAll(main.getPropAsList());
         return model;
     }
 
