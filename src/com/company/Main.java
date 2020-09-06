@@ -47,7 +47,7 @@ public class Main {
     {
         ArrayList scanners = new ArrayList();
         int count = Integer.parseInt(props.getProperty("count"));
-        for (int i = 0; i <= count; i++)
+        for (int i = count; i >= 0; i--)
         {
             scanners.add(props.getProperty(String.valueOf(i)));
         }

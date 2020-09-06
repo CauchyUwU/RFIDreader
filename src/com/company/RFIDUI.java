@@ -23,6 +23,7 @@ public class RFIDUI
     final static String SYNCDEL = "Alle Logs übertragen";
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
+    private int newest;
 
     public RFIDUI(Main main)
     {
@@ -34,7 +35,7 @@ public class RFIDUI
     {
         JFrame frame = new JFrame("RFIDreader");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(750,450));
+        frame.setPreferredSize(new Dimension(750,500));
         frame.setBackground(new Color(255,255,255));
 
         JPanel cards = new JPanel(new CardLayout());
@@ -105,24 +106,24 @@ public class RFIDUI
         JTextPane newestScannerText = new JTextPane();
         newestScannerText.setMargin(new Insets(5,5,5,5));
 
-        int newest = Integer.parseInt(main.getProps().getProperty("count"));
+        newest = Integer.parseInt(main.getProps().getProperty("count"));
         if(newest >= 0)
         {
             String newestScanner = main.getProps().getProperty(String.valueOf(newest));
             newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
-                    "\n Um einen neuen Scanner hinzuzufügen, geben Sie im Textfeld unten den Pfad zum neuen Scanner ein." +
+                    "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                     "\n Für mehr Informationen siehe \"Hilfe\".");
         }
         else
         {
-            newestScannerText.setText("Aktuell ist kein Scanner bekannt. Fügen Sie unten einen Scanner hinzu um zu beginnen." +
+            newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                     "\n Für mehr Informationen siehe \"Hilfe\".");
         }
         newestScannerText.setEditable(false);
         //newestScannerText.setSize(490, 90);
         newestScannerText.setBackground(veryLightGrey);
         topPanel.add(newestScannerText, BorderLayout.NORTH);
-        topPanel.setMaximumSize(new Dimension(495, 100));
+        topPanel.setMaximumSize(new Dimension(495, 200));
         topPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         JPanel midPanel = new JPanel();
@@ -130,6 +131,8 @@ public class RFIDUI
         JTextField addScannerText = new JTextField();
         addScannerText.setSize(350, 27);
         addScannerText.setPreferredSize(new Dimension(350, 27));
+        addScannerText.setText(main.getProps().getProperty(String.valueOf(newest)));
+
         JTextPane addScannerExplanation = new JTextPane();
         addScannerExplanation.setText("Um einen neuen Scanner hinzuzufügen klicken Sie auf \"Durchsuchen\" und wählen Sie den Scanner aus. \n Alternativ können Sie " +
                 "aus der Liste unten einen bereits bekannten Scanner durch Klicken auswählen.");
@@ -169,7 +172,32 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                System.out.println("scannerList"); //TODO
+                newest = Integer.parseInt(main.getProps().getProperty("count"))-scannerList.getSelectedIndex();
+                if(newest >= 0)
+                {
+                    File temp = new File(main.getProps().getProperty(String.valueOf(newest)));
+                    if(!temp.exists())
+                    {
+                        JOptionPane.showMessageDialog(null,
+                                "Der Scanner kann nicht gefunden werden. Kopieren und Löschen von Logs nicht möglich.",
+                                "Achtung!",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    else {
+                        String text = scannerList.getSelectedValuesList().get(0).toString();
+                        addScannerText.setText(text);
+                        String newestScanner = main.getProps().getProperty(String.valueOf(newest));
+                        newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
+                                "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                                "\n Für mehr Informationen siehe \"Hilfe\".");
+                    }
+                }
+                else
+                {
+                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                }
+
             }
         });
         JList scannerListClose = new JList();
@@ -207,12 +235,12 @@ public class RFIDUI
         JPanel listPanel = new JPanel();
         listPanel.add(scannerList, BorderLayout.WEST);
         listPanel.add(scannerListClose, BorderLayout.EAST);
-        listPanel.setSize(new Dimension(495, 250));
+        listPanel.setSize(new Dimension(495, 200));
         JScrollPane scrollFrame = new JScrollPane(listPanel);
-        scrollFrame.setPreferredSize(new Dimension(495,250));
+        scrollFrame.setPreferredSize(new Dimension(495,200));
         scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         bottomPanel.add(scrollFrame, BorderLayout.CENTER);
-        bottomPanel.setMaximumSize(new Dimension(495,225));
+        bottomPanel.setMaximumSize(new Dimension(495,200));
 
         search.addMouseListener(new MouseAdapter(){
             @Override
@@ -469,13 +497,7 @@ public class RFIDUI
         };
     }
 
-    /*private JScrollPane scannerListSetup()
-    {
-
-        return scrollFrame;
-    }*/
-
-    private DefaultListModel searchButtonClicked(JPanel parent) //TODO thread
+    private DefaultListModel searchButtonClicked(JPanel parent)
     {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Scanner-Pfad auswählen");
