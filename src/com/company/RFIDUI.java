@@ -222,14 +222,21 @@ public class RFIDUI
 // tell the jlist to use the panel array for its data
         scannerListClose.setListData(panels);
         scannerListClose.setBackground(veryLightGrey);
-        //TODO custom renderer
         scannerListClose.setFixedCellHeight(25);
         scannerListClose.setFixedCellWidth(25);
         scannerListClose.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                System.out.println("scannerListClose"); //TODO
+                DefaultListModel model = delButtonClicked(newscan, scannerListClose.getSelectedIndex());
+                scannerList.setModel(model);
+                Object[] panels = new Object[scannerList.getModel().getSize()];
+                for (int i = 0; i < scannerList.getModel().getSize(); i++)
+                {
+                    panels[i] = closePanel;
+                }
+
+                scannerListClose.setListData(panels); //TODO
             }
         });
         JPanel listPanel = new JPanel();
@@ -252,8 +259,13 @@ public class RFIDUI
                 {
                     panels[i] = closePanel;
                 }
-
                 scannerListClose.setListData(panels);
+                String text = scannerList.getModel().getElementAt(0).toString();
+                addScannerText.setText(text);
+                String newestScanner = text;
+                newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
+                        "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                        "\n Für mehr Informationen siehe \"Hilfe\".");
             }
         });
 
@@ -269,7 +281,6 @@ public class RFIDUI
 
     private JPanel synchroDeletePart()
     {
-        //explanations TODO
         //copy some (chosen) values from clipboard and delete save file/clipboard
         //maybe save this in file?
         JPanel syncdelPart = new JPanel();
@@ -513,7 +524,7 @@ public class RFIDUI
         }
 
         DefaultListModel model = new DefaultListModel();
-        DelInsThread thread = new DelInsThread(ThreadState.COPY, main, model, this);
+        DelInsThread thread = new DelInsThread(ThreadState.COPY, main, model, this, -1);
         thread.start();
         try {
             thread.join();
@@ -522,8 +533,21 @@ public class RFIDUI
             e.printStackTrace();
             model.add(0, "Fehler beim Laden der Liste.");
         }
-        //model.addAll(main.getPropAsList());
         return model;
     }
 
+    private DefaultListModel delButtonClicked(JPanel newscan, int selectedIndex)
+    {
+        DefaultListModel model = new DefaultListModel();
+        DelInsThread thread = new DelInsThread(ThreadState.DELETE, main, model, this, selectedIndex);
+        thread.start();
+        try {
+            thread.join();
+            model = thread.getRet();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            model.add(0, "Fehler beim Laden der Liste.");
+        }
+        return model;
+    }
 }

@@ -1,6 +1,7 @@
 package com.company;
 
 import javax.swing.*;
+import java.io.File;
 
 public class DelInsThread extends Thread
 {
@@ -8,16 +9,18 @@ public class DelInsThread extends Thread
     private Main main;
     private DefaultListModel model;
     private RFIDUI ui;
+    private int index;
 
     private DefaultListModel ret;
 
-    public DelInsThread(ThreadState state, Main main, DefaultListModel model, RFIDUI ui)
+    public DelInsThread(ThreadState state, Main main, DefaultListModel model, RFIDUI ui, int i)
     {
         this.state = state;
         this.main = main;
         this.model = model;
         this.ui = ui;
         this.ret = new DefaultListModel();
+        this.index = i;
     }
 
     @Override
@@ -28,8 +31,12 @@ public class DelInsThread extends Thread
         }
         else
         {
-            System.out.println("delete");
+            delete();
         }
+    }
+
+    synchronized void delete() {//TODO
+
     }
 
     synchronized void copy()
@@ -37,7 +44,7 @@ public class DelInsThread extends Thread
         ret.addAll(main.getPropAsList());
     }
 
-    public DefaultListModel getRet() {
+    synchronized DefaultListModel getRet() {
         return ret;
     }
 
