@@ -24,6 +24,7 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
+    final static String logPath = "D:\\logTemp";
 
     public RFIDUI(Main main)
     {
@@ -323,13 +324,14 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs = new ArrayList();
-        logs.add("test"); //TODO get from path
-        logs.add("test2");
+        ArrayList logs;
+        File tempFolder = new File(logPath);
+        logs = new ArrayList(Arrays.asList(tempFolder.list()));
 
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
         logsList.setFixedCellWidth(480);
+        logsList.setBackground(veryLightGrey);
         logsList.setCellRenderer(getRendererScanners());
         logsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         logsList.setSelectionModel(new DefaultListSelectionModel() {
@@ -412,14 +414,15 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs = new ArrayList();
-        logs.add("test"); //TODO get from path
-        logs.add("test2");
+        ArrayList logs;
+        File tempFolder = new File(logPath);
+        logs = new ArrayList(Arrays.asList(tempFolder.list()));
 
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
         logsList.setFixedCellWidth(480);
         logsList.setCellRenderer(getRendererScanners());
+        logsList.setBackground(veryLightGrey);
         logsList.setSelectionModel(new DefaultListSelectionModel() {
             public void setSelectionInterval(int i, int j) {
                 super.setSelectionInterval(-1,-1);
@@ -522,6 +525,8 @@ public class RFIDUI
                                                           boolean cellHasFocus) {
                 JLabel listCellRendererComponent = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,cellHasFocus);
                 listCellRendererComponent.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1,Color.GRAY));
+                listCellRendererComponent.setBackground(Color.white);
+                listCellRendererComponent.setBackground (isSelected ? Color.lightGray : Color.white);
                 return listCellRendererComponent;
             }
         };
@@ -555,7 +560,7 @@ public class RFIDUI
         return model;
     }
 
-    private DefaultListModel delButtonClicked(JPanel newscan, int selectedIndex) //TODO incorrect if scanner neq 0 is deleted
+    private DefaultListModel delButtonClicked(JPanel newscan, int selectedIndex)
     {
         DefaultListModel model = new DefaultListModel();
         DelInsThread thread = new DelInsThread(ThreadState.DELETE, main, model, this, selectedIndex);

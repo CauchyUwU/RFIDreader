@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Properties;
 
 public class DelInsThread extends Thread
@@ -39,7 +40,7 @@ public class DelInsThread extends Thread
         }
     }
 
-    synchronized void delete() {//TODO
+    synchronized void delete() {
         try {
             Properties props = main.getProps();
             FileInputStream in = new FileInputStream("resources/scanners.properties");

@@ -1,4 +1,14 @@
 package com.company;
 
-public class CopyThread {
+import java.util.ArrayList;
+
+public class CopyThread
+{
+    private String path;
+
+    public CopyThread(String path)
+    {
+        this.path = path;
+    }
+
 }
