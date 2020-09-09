@@ -45,7 +45,7 @@ public class DelInsThread extends Thread
             FileInputStream in = new FileInputStream("resources/scanners.properties");
             props.load(in);
             props.remove(String.valueOf(index));
-            for(int i = index+1; i < Integer.parseInt(props.getProperty("count")); i++)
+            for(int i = index; i < Integer.parseInt(props.getProperty("count")); i++)
             {
                 props.setProperty(String.valueOf(i), props.getProperty(String.valueOf(i+1)));
             }
