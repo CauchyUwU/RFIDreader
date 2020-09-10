@@ -129,10 +129,6 @@ public class RFIDUI
 
         JPanel midPanel = new JPanel();
         midPanel.setLayout(new BorderLayout());
-        JTextField addScannerText = new JTextField();
-        addScannerText.setSize(350, 27);
-        addScannerText.setPreferredSize(new Dimension(350, 27));
-        addScannerText.setText(main.getProps().getProperty(String.valueOf(newest)));
 
         JTextPane addScannerExplanation = new JTextPane();
         addScannerExplanation.setText("Um einen neuen Scanner hinzuzufügen klicken Sie auf \"Durchsuchen\" und wählen Sie den Scanner aus. \n Alternativ können Sie " +
@@ -143,7 +139,6 @@ public class RFIDUI
         midPanel.add(addScannerExplanation, BorderLayout.NORTH);
         JPanel flowPanel = new JPanel();
         flowPanel.setLayout(new FlowLayout());
-        flowPanel.add(addScannerText);
         JButton search = new JButton("Durchsuchen");
 
         flowPanel.add(search);
@@ -185,8 +180,7 @@ public class RFIDUI
                                 JOptionPane.ERROR_MESSAGE);
                     }
                     else {
-                        String text = scannerList.getSelectedValuesList().get(0).toString();
-                        addScannerText.setText(text);
+                        String text = scannerList.getModel().getElementAt(0).toString();
                         String newestScanner = main.getProps().getProperty(String.valueOf(newest));
                         newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
                                 "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
@@ -249,13 +243,11 @@ public class RFIDUI
                     newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
                             "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                             "\n Für mehr Informationen siehe \"Hilfe\".");
-                    addScannerText.setText(newestScanner);
                 }
                 else
                 {
                     newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                             "\n Für mehr Informationen siehe \"Hilfe\".");
-                    addScannerText.setText("");
                 }
             }
         });
@@ -281,13 +273,13 @@ public class RFIDUI
                 }
                 scannerListClose.setListData(panels);
                 String text = scannerList.getModel().getElementAt(0).toString();
-                addScannerText.setText(text);
                 String newestScanner = text;
                 newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
                         "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                         "\n Für mehr Informationen siehe \"Hilfe\".");
             }
         });
+
 
         newscan.add(topPanel);
         //newscan.add(Box.createRigidArea(new Dimension(490,100)));
@@ -325,8 +317,8 @@ public class RFIDUI
         labelList.setEditable(false);
 
         ArrayList logs;
-        File tempFolder = new File(logPath);
-        logs = new ArrayList(Arrays.asList(tempFolder.list()));
+        File tempFolder = new File(logPath); //TODO exists?
+        logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
 
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
@@ -374,8 +366,7 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                copy(progBar, logsList.getSelectedValuesList());
-                System.out.println(Arrays.toString(logsList.getSelectedValuesList().toArray())); //TODO
+                copy(progBar, new ArrayList(logsList.getSelectedValuesList()));
             }
         });
         confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -414,9 +405,9 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs;
+        ArrayList logs; //TODO exists?
         File tempFolder = new File(logPath);
-        logs = new ArrayList(Arrays.asList(tempFolder.list()));
+        logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
 
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
@@ -492,15 +483,41 @@ public class RFIDUI
         return help;
     }
 
-    private boolean copy(JProgressBar prog, List toCopy)
+    private boolean copy(JProgressBar prog, ArrayList toCopy)
     {
         //TODO actually copy & not return true always (thread)
         prog.setValue(0);
-        int len = toCopy.size();
+        CopyThread copyThread = new CopyThread(prog, toCopy);
+        copyThread.start();
+        while(copyThread.isAlive())
+        {   //TODO try/catch for InterruptedException
+            prog.repaint();
+            if(copyThread.isInterrupted())
+            {
+                JOptionPane.showMessageDialog(null,
+                        "Kopiervorgang unterbrochen. Bitte Verbindung prüfen.",
+                        "Achtung!",
+                        JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+            System.out.println("running");
+        }
+        Object[] options = {"OK"};
+        JOptionPane.showOptionDialog(null,
+                "Kopieren erfolgreich","Erfolg",
+                JOptionPane.PLAIN_MESSAGE,
+                JOptionPane.INFORMATION_MESSAGE,
+                null,
+                options,
+                options[0]);
+        prog.setValue(0);
+
+
+        /*int len = toCopy.size();
         for (int i = 0; i < len; i++)
         {
             prog.setValue(prog.getValue() + 100/len);
-        }
+        }*/
         return true;
     }
 
