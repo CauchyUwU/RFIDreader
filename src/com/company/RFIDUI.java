@@ -489,10 +489,10 @@ public class RFIDUI
         prog.setValue(0);
         CopyThread copyThread = new CopyThread(prog, toCopy);
         copyThread.start();
-        while(copyThread.isAlive())
+        while(copyThread.isAlive() && copyThread.getInterrupted() == null) //TODO maybe nullpointer?
         {   //TODO try/catch for InterruptedException
             prog.repaint();
-            if(copyThread.isInterrupted())
+            if(copyThread.getInterrupted() == null)
             {
                 JOptionPane.showMessageDialog(null,
                         "Kopiervorgang unterbrochen. Bitte Verbindung prüfen.",
