@@ -8,13 +8,15 @@ public class CopyThread extends Thread
 {
     private JProgressBar prog;
     private ArrayList toCopy;
+    private RFIDUI ui;
 
     private InterruptedException interrupted;
 
-    public CopyThread(JProgressBar prog, ArrayList toCopy)
+    public CopyThread(JProgressBar prog, ArrayList toCopy, RFIDUI ui)
     {
         this.prog = prog;
         this.toCopy = toCopy;
+        this.ui = ui;
     }
 
     public void run() //TODO interrupted exception when connection lost
@@ -31,10 +33,12 @@ public class CopyThread extends Thread
             {
                 InterruptedException e = new InterruptedException();
                 interrupted = e;
+                ui.copyError(prog);
                 return;
             }
             prog.setValue(prog.getValue() + 100/len);
         }
+        ui.copySuccess(prog);
     }
 
     public InterruptedException getInterrupted() {

@@ -24,7 +24,7 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
-    final static String logPath = "D:\\logTemp";
+    final static String logPath = "D:\\logTemp"; //internal storage/emulated/handset/uhf
 
     public RFIDUI(Main main)
     {
@@ -483,25 +483,16 @@ public class RFIDUI
         return help;
     }
 
-    private boolean copy(JProgressBar prog, ArrayList toCopy)
+    private void copy(JProgressBar prog, ArrayList toCopy)
     {
         //TODO actually copy & not return true always (thread)
         prog.setValue(0);
-        CopyThread copyThread = new CopyThread(prog, toCopy);
+        CopyThread copyThread = new CopyThread(prog, toCopy, this);
         copyThread.start();
-        while(copyThread.isAlive() && copyThread.getInterrupted() == null) //TODO maybe nullpointer?
-        {   //TODO try/catch for InterruptedException
-            prog.repaint();
-            if(copyThread.getInterrupted() == null)
-            {
-                JOptionPane.showMessageDialog(null,
-                        "Kopiervorgang unterbrochen. Bitte Verbindung prüfen.",
-                        "Achtung!",
-                        JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-            System.out.println("running");
-        }
+    }
+
+    public boolean copySuccess(JProgressBar prog)
+    {
         Object[] options = {"OK"};
         JOptionPane.showOptionDialog(null,
                 "Kopieren erfolgreich","Erfolg",
@@ -511,14 +502,19 @@ public class RFIDUI
                 options,
                 options[0]);
         prog.setValue(0);
-
-
-        /*int len = toCopy.size();
-        for (int i = 0; i < len; i++)
-        {
-            prog.setValue(prog.getValue() + 100/len);
-        }*/
         return true;
+    }
+
+    public boolean copyError(JProgressBar prog)
+    {
+        //TODO maybe nullpointer?
+        //TODO try/catch for InterruptedException
+        JOptionPane.showMessageDialog(null,
+                "Kopiervorgang unterbrochen. Bitte Verbindung prüfen.",
+                "Achtung!",
+                JOptionPane.ERROR_MESSAGE);
+        prog.setValue(0);
+        return false;
     }
 
     private ListCellRenderer<? super String> getRenderer() {
