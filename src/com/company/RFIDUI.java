@@ -366,7 +366,10 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                copy(progBar, new ArrayList(logsList.getSelectedValuesList()));
+                copy(progBar, new ArrayList(logsList.getSelectedValuesList()), logsList);
+                ArrayList logs;
+                logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
+                logsList.setListData(logs.toArray());
             }
         });
         confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -382,7 +385,7 @@ public class RFIDUI
         return syncdelPart;
     }
 
-    private JPanel synchroDelete()
+    private JPanel synchroDelete() //TODO merge w SynchroDeletePart or implement in SynchDelPart
     {
         JPanel syncdel = new JPanel();
         syncdel.setLayout(new BoxLayout(syncdel, BoxLayout.Y_AXIS));
@@ -443,13 +446,13 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                ArrayList temp = new ArrayList();
+                ArrayList temp = new ArrayList(); //TODO not working bc it updates before thread is finished
                 for(int i = 0; i < logsList.getModel().getSize(); i++)
                 {
                     temp.add(logsList.getModel().getElementAt(i));
                 }
-                copy(progBar, temp);
-                System.out.println(Arrays.toString(temp.toArray())); //TODO
+
+                copy(progBar, temp, logsList);
             }
         });
         confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -483,15 +486,14 @@ public class RFIDUI
         return help;
     }
 
-    private void copy(JProgressBar prog, ArrayList toCopy)
+    private void copy(JProgressBar prog, ArrayList toCopy, JList logsList)
     {
-        //TODO actually copy & not return true always (thread)
         prog.setValue(0);
-        CopyThread copyThread = new CopyThread(prog, toCopy, this);
+        CopyThread copyThread = new CopyThread(prog, toCopy, this, logsList);
         copyThread.start();
     }
 
-    public boolean copySuccess(JProgressBar prog)
+    public boolean copySuccess(JProgressBar prog, RFIDUI ui, JList logsList)
     {
         Object[] options = {"OK"};
         JOptionPane.showOptionDialog(null,
@@ -502,13 +504,27 @@ public class RFIDUI
                 options,
                 options[0]);
         prog.setValue(0);
+
+        ArrayList logs;
+        File tempFolder = new File(logPath);
+
+        DefaultListModel model = new DefaultListModel();
+        ArrayList list = new ArrayList();
+        list.addAll(Arrays.asList(tempFolder.listFiles()));
+        model.addAll(list);
+        logsList.setModel(model);
+        Object[] data = new Object[logsList.getModel().getSize()];
+        for (int i = 0; i < logsList.getModel().getSize(); i++)
+        {
+            data[i] = logsList.getModel().getElementAt(i);
+        }
+        logsList.setListData(data);
+        logsList.repaint();
         return true;
     }
 
     public boolean copyError(JProgressBar prog)
     {
-        //TODO maybe nullpointer?
-        //TODO try/catch for InterruptedException
         JOptionPane.showMessageDialog(null,
                 "Kopiervorgang unterbrochen. Bitte Verbindung prüfen.",
                 "Achtung!",
