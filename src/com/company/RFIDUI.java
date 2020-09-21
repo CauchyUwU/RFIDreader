@@ -25,6 +25,7 @@ public class RFIDUI
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
     final static String logPath = "D:\\logTemp"; //internal storage/emulated/handset/uhf
+    static boolean full;
 
     public RFIDUI(Main main)
     {
@@ -42,9 +43,9 @@ public class RFIDUI
         JPanel cards = new JPanel(new CardLayout());
         JPanel card0 = newScan();
         cards.add(card0, NEWSCAN);
-        JPanel card1 = synchroDeletePart();
+        JPanel card1 = syncDel(false);
         cards.add(card1, SYNCDELPART);
-        JPanel card2 = synchroDelete();
+        JPanel card2 = syncDel(true);
         cards.add(card2, SYNCDEL);
         JPanel card3 = help();
         cards.add(card3, HELP);
@@ -69,9 +70,15 @@ public class RFIDUI
                         System.out.println(0);
                         break;
                     case 1:
+                        cl.removeLayoutComponent(card1);
+                        JPanel card1 = syncDel(false);
+                        cards.add(card1, SYNCDELPART);
                         cl.show(cards, SYNCDELPART);
                         break;
                     case 2:
+                        cl.removeLayoutComponent(card2);
+                        JPanel card2 = syncDel(true);
+                        cards.add(card2, SYNCDEL);
                         cl.show(cards, SYNCDEL);
                         break;
                     case 3:
@@ -291,6 +298,7 @@ public class RFIDUI
         return newscan;
     }
 
+    @Deprecated
     private JPanel synchroDeletePart()
     {
         //copy some (chosen) values from clipboard and delete save file/clipboard
@@ -385,6 +393,7 @@ public class RFIDUI
         return syncdelPart;
     }
 
+    @Deprecated
     private JPanel synchroDelete() //TODO merge w SynchroDeletePart or implement in SynchDelPart
     {
         JPanel syncdel = new JPanel();
@@ -464,6 +473,138 @@ public class RFIDUI
         syncdel.add(Box.createVerticalStrut(10));
         syncdel.add(progBar);
 
+        syncdel.setPreferredSize(new Dimension(500,450));
+        return syncdel;
+    }
+
+    private JPanel syncDel(Boolean full)
+    {
+        JPanel syncdel = new JPanel();
+        syncdel.setLayout(new BoxLayout(syncdel, BoxLayout.Y_AXIS));
+
+        JTextPane explanation = new JTextPane();
+
+        if(!full)
+        {
+            explanation.setText("Wählen Sie unten alle Logs aus, die Sie kopieren wollen. \nAchtung: die kopierten Logs werden vom " +
+                    "Scanner gelöscht. Trennen Sie wärend des Kopierens nicht die Verbindung zum Scanner, da sonst Daten verloren gehen " +
+                    "oder beschädigt werden können!");
+        }
+        else
+        {
+            explanation.setText("Der Button \"Kopieren\" kopiert alle unten angezeigten Logs. \nAchtung: die kopierten Logs werden vom " +
+                    "Scanner gelöscht. Trennen Sie wärend des Kopierens nicht die Verbindung zum Scanner, da sonst Daten verloren gehen " +
+                    "oder beschädigt werden können!");
+        }
+
+        explanation.setMinimumSize(new Dimension(495,75));
+        explanation.setMaximumSize(new Dimension(495,75));
+        explanation.setPreferredSize(new Dimension(495,75));
+        explanation.setBackground(veryLightGrey);
+        explanation.setEditable(false);
+        JTextPane labelList = new JTextPane();
+        labelList.setText("Liste der aktuellen Logs:");
+        labelList.setMinimumSize(new Dimension(495,25));
+        labelList.setMaximumSize(new Dimension(495,25));
+        labelList.setPreferredSize(new Dimension(495,25));
+        labelList.setBackground(veryLightGrey);
+        labelList.setEditable(false);
+
+        ArrayList logs; //TODO exists?
+        File tempFolder = new File(logPath);
+        logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
+        JList logsList = new JList(logs.toArray());
+        logsList.setFixedCellHeight(25);
+        logsList.setFixedCellWidth(480);
+        logsList.setCellRenderer(getRendererScanners());
+        logsList.setBackground(veryLightGrey);
+
+        if(!full)
+        {
+            logsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+            logsList.setSelectionModel(new DefaultListSelectionModel() {
+                private static final long serialVersionUID = 1L;
+                boolean gestureStarted = false;
+                @Override
+                public void setSelectionInterval(int index0, int index1) {
+                    if(!gestureStarted){
+                        if (isSelectedIndex(index0)) {
+                            super.removeSelectionInterval(index0, index1);
+                        } else {
+                            super.addSelectionInterval(index0, index1);
+                        }
+                    }
+                    gestureStarted = true;
+                }
+                @Override
+                public void setValueIsAdjusting(boolean isAdjusting) {
+                    if (isAdjusting == false) {
+                        gestureStarted = false;
+                    }
+                }
+            });
+        }
+        else
+        {
+            logsList.setSelectionModel(new DefaultListSelectionModel() {
+                public void setSelectionInterval(int i, int j) {
+                    super.setSelectionInterval(-1,-1);
+                }
+                public void addSelectionInterval(int i, int j) {
+                    super.addSelectionInterval(-1, -1);
+                }
+                public void setLeadSelectionIndex(int i) {
+                    super.setLeadSelectionIndex(-1);
+                }
+                public void setAnchorSelectionIndex(int i) {
+                    super.setAnchorSelectionIndex(-1);
+                }
+            });
+        }
+
+        JScrollPane scrollFrame = new JScrollPane(logsList);
+        scrollFrame.setMinimumSize(new Dimension(495,200));
+        scrollFrame.setMaximumSize(new Dimension(495,200));
+        scrollFrame.setPreferredSize(new Dimension(495,200));
+        scrollFrame.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JProgressBar progBar = new JProgressBar();
+        progBar.setValue(0);
+        progBar.setStringPainted(true);
+        JButton confirm = new JButton("Kopieren beginnen");
+
+        if(!full)
+        {
+            confirm.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e)
+                {
+                    copy(progBar, new ArrayList(logsList.getSelectedValuesList()), logsList);
+                }
+            });
+        }
+        else
+        {
+            confirm.addMouseListener(new MouseAdapter(){
+                @Override
+                public void mouseClicked(MouseEvent e)
+                {
+                    ArrayList temp = new ArrayList();
+                    for(int i = 0; i < logsList.getModel().getSize(); i++)
+                    {
+                        temp.add(logsList.getModel().getElementAt(i));
+                    }
+                    copy(progBar, temp, logsList);
+                }
+            });
+        }
+
+        confirm.setAlignmentX(Component.CENTER_ALIGNMENT);
+        syncdel.add(explanation);
+        syncdel.add(labelList);
+        syncdel.add(scrollFrame);
+        syncdel.add(confirm);
+        syncdel.add(Box.createVerticalStrut(10));
+        syncdel.add(progBar);
         syncdel.setPreferredSize(new Dimension(500,450));
         return syncdel;
     }
