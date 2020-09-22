@@ -12,13 +12,13 @@ public class Main {
     //private Preferences prefs; //replace with property
     private Properties props;
     InputStream inputStream;
+    private final static String propFileName = System.getProperty("user.home") + "\\Desktop\\RFIDreader\\scanners.properties";
 
     public Main()
     {
         props = new Properties();
-        String propFileName = "resources/scanners.properties";
         try {
-            inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
+            inputStream = new FileInputStream(propFileName);
             if (inputStream != null) {
                 props.load(inputStream);
             } else {
@@ -60,13 +60,12 @@ public class Main {
 
     public void resetProps() {
         try {
-            String propertiesFilePath = ("resources/scanners.properties");
-            FileInputStream fis = new FileInputStream(propertiesFilePath);
+            FileInputStream fis = new FileInputStream(propFileName);
             props.load(fis);
 
             props.put("count", "-1");
 
-            FileOutputStream fos = new FileOutputStream(propertiesFilePath);
+            FileOutputStream fos = new FileOutputStream(propFileName);
             props.store(fos,null);
             System.out.println("SUCCESS");
         }
@@ -80,14 +79,13 @@ public class Main {
         int count = Integer.parseInt(props.getProperty("count")) + 1;
 
         try {
-            String propertiesFilePath = ("resources/scanners.properties");
-            FileInputStream fis = new FileInputStream(propertiesFilePath);
+            FileInputStream fis = new FileInputStream(propFileName);
             props.load(fis);
 
             props.setProperty("count", String.valueOf(count));
             props.setProperty(String.valueOf(count), selectedFile.toString());
 
-            FileOutputStream fos = new FileOutputStream(propertiesFilePath);
+            FileOutputStream fos = new FileOutputStream(propFileName);
             props.store(fos,null);
             System.out.println("SUCCESS");
             fis.close();

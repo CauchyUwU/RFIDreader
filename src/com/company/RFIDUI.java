@@ -325,7 +325,7 @@ public class RFIDUI
         labelList.setEditable(false);
 
         ArrayList logs;
-        File tempFolder = new File(logPath); //TODO exists?
+        File tempFolder = new File(logPath);
         logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
 
         JList logsList = new JList(logs.toArray());
@@ -394,7 +394,7 @@ public class RFIDUI
     }
 
     @Deprecated
-    private JPanel synchroDelete() //TODO merge w SynchroDeletePart or implement in SynchDelPart
+    private JPanel synchroDelete()
     {
         JPanel syncdel = new JPanel();
         syncdel.setLayout(new BoxLayout(syncdel, BoxLayout.Y_AXIS));
@@ -417,7 +417,7 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs; //TODO exists?
+        ArrayList logs;
         File tempFolder = new File(logPath);
         logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
 
@@ -455,7 +455,7 @@ public class RFIDUI
             @Override
             public void mouseClicked(MouseEvent e)
             {
-                ArrayList temp = new ArrayList(); //TODO not working bc it updates before thread is finished
+                ArrayList temp = new ArrayList();
                 for(int i = 0; i < logsList.getModel().getSize(); i++)
                 {
                     temp.add(logsList.getModel().getElementAt(i));
@@ -510,9 +510,16 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs; //TODO exists?
+        ArrayList logs;
         File tempFolder = new File(logPath);
-        logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
+        if(tempFolder.exists())
+        {
+            logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
+        }
+        else
+        {
+            logs = new ArrayList(Arrays.asList("Log-Ordner nicht gefunden"));
+        }
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
         logsList.setFixedCellWidth(480);
@@ -578,7 +585,14 @@ public class RFIDUI
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    copy(progBar, new ArrayList(logsList.getSelectedValuesList()), logsList);
+                    if(tempFolder.exists())
+                    {
+                        copy(progBar, new ArrayList(logsList.getSelectedValuesList()), logsList);
+                    }
+                    else
+                    {
+                        copyError(progBar);
+                    }
                 }
             });
         }
@@ -588,12 +602,19 @@ public class RFIDUI
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    ArrayList temp = new ArrayList();
-                    for(int i = 0; i < logsList.getModel().getSize(); i++)
+                    if(tempFolder.exists())
                     {
-                        temp.add(logsList.getModel().getElementAt(i));
+                        ArrayList temp = new ArrayList();
+                        for(int i = 0; i < logsList.getModel().getSize(); i++)
+                        {
+                            temp.add(logsList.getModel().getElementAt(i));
+                        }
+                        copy(progBar, temp, logsList);
                     }
-                    copy(progBar, temp, logsList);
+                    else
+                    {
+                        copyError(progBar);
+                    }
                 }
             });
         }

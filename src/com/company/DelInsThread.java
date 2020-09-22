@@ -1,10 +1,7 @@
 package com.company;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Properties;
 
@@ -18,8 +15,12 @@ public class DelInsThread extends Thread
 
     private DefaultListModel ret;
 
+    private final static String propsPath = System.getProperty("user.home") + "\\Desktop\\RFIDreader\\scanners.properties";
+
     public DelInsThread(ThreadState state, Main main, DefaultListModel model, RFIDUI ui, int i)
     {
+        File f = new File(propsPath);
+        System.out.println(f.exists());
         this.state = state;
         this.main = main;
         this.model = model;
@@ -43,7 +44,7 @@ public class DelInsThread extends Thread
     synchronized void delete() {
         try {
             Properties props = main.getProps();
-            FileInputStream in = new FileInputStream("resources/scanners.properties");
+            InputStream in = new FileInputStream(propsPath);
             props.load(in);
             props.remove(String.valueOf(index));
             for(int i = index; i < Integer.parseInt(props.getProperty("count")); i++)
@@ -52,7 +53,7 @@ public class DelInsThread extends Thread
             }
             props.remove(String.valueOf(Integer.parseInt(props.getProperty("count"))));
             props.setProperty("count", String.valueOf(Integer.parseInt(props.getProperty("count"))-1));
-            OutputStream out = new FileOutputStream("resources/scanners.properties");
+            OutputStream out = new FileOutputStream(propsPath);
             props.store(out, null);
             in.close();
             out.close();

@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="RFIDreader:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/RFIDreader_jar</output-path>
+    <root id="archive" name="RFIDreader.jar">
+      <element id="module-output" name="RFIDreader" />
+    </root>
+  </artifact>
+</component>
