@@ -12,6 +12,7 @@ public class CopyThread extends Thread
     private ArrayList toCopy;
     private RFIDUI ui;
     private JList logsList;
+    private final static String logDest = "C:\\Users\\lisas\\Desktop\\RFIDreader\\Logs";
 
     private InterruptedException interrupted;
 
@@ -33,7 +34,7 @@ public class CopyThread extends Thread
             {
                 try
                 {
-                    if(temp.renameTo(new File("D:\\logDest" + "\\" + temp.getName())))
+                    if(temp.renameTo(new File(logDest + "\\" + temp.getName())))
                     {
                         temp.delete();
                     }

@@ -17,8 +17,13 @@ public class Main {
     public Main()
     {
         props = new Properties();
+        File temp = new File(propFileName);
         try {
-            inputStream = new FileInputStream(propFileName);
+            if(!temp.exists())
+            {
+                resetProps(temp);
+            }
+            inputStream = new FileInputStream(temp);
             if (inputStream != null) {
                 props.load(inputStream);
             } else {
@@ -58,14 +63,22 @@ public class Main {
         return props;
     }
 
-    public void resetProps() {
+    public void resetProps(File file) {
         try {
-            FileInputStream fis = new FileInputStream(propFileName);
+            file.createNewFile();
+            FileInputStream fis = new FileInputStream(file);
             props.load(fis);
+
+            Integer count = Integer.parseInt(props.getProperty("count"));
+
+            for(int i = 0; i <= count; i++)
+            {
+                props.remove(String.valueOf(count));
+            }
 
             props.put("count", "-1");
 
-            FileOutputStream fos = new FileOutputStream(propFileName);
+            FileOutputStream fos = new FileOutputStream(file);
             props.store(fos,null);
             System.out.println("SUCCESS");
         }

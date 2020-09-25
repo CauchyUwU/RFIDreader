@@ -24,8 +24,7 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
-    final static String logPath = "D:\\logTemp"; //internal storage/emulated/handset/uhf
-    static boolean full;
+    final static String logPath = "D:\\logTemp"; //internal storage/emulated/handset/uhf //TODO set for scanner
 
     public RFIDUI(Main main)
     {
@@ -635,15 +634,18 @@ public class RFIDUI
         JPanel help = new JPanel();
         help.setLayout(new BoxLayout(help, BoxLayout.Y_AXIS));
 
-        JTextPane placeholder = new JTextPane();
-        placeholder.setText("Placeholder");
-        //placeholder.setMinimumSize(new Dimension(495,75));
-        //placeholder.setMaximumSize(new Dimension(495,75));
-        //placeholder.setPreferredSize(new Dimension(495,75));
-        placeholder.setBackground(veryLightGrey);
-        placeholder.setEditable(false);
+        JTextPane helpText = new JTextPane();
+        helpText.setContentType("text/html");
+        helpText.setText("<b>Mein Scanner wird nicht erkannt <br></b>" +
+                "Prüfen Sie die Verbindung zum Scanner. Um erfolgreich erkannt zu werden, muss auf dem Scanner selbst der USB-Modus aktiviert sein. <br>" +
+                "<b>Das Programm erkennt den Scanner, kann aber die Logs nicht finden</b>"); //TODO this case
+        //helpText.setMinimumSize(new Dimension(495,75));
+        //helpText.setMaximumSize(new Dimension(495,75));
+        //helpText.setPreferredSize(new Dimension(495,75));
+        helpText.setBackground(veryLightGrey);
+        helpText.setEditable(false);
 
-        help.add(placeholder);
+        help.add(helpText);
 
         return help;
     }
