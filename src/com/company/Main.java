@@ -1,5 +1,8 @@
 package com.company;
 
+import jmtp.PortableDevice;
+import jmtp.PortableDeviceManager;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +12,6 @@ import java.util.prefs.Preferences;
 
 public class Main {
 
-    //private Preferences prefs; //replace with property
     private Properties props;
     InputStream inputStream;
     private final static String propFileName = System.getProperty("user.home") + "\\Desktop\\RFIDreader\\scanners.properties";

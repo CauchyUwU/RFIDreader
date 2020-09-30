@@ -22,6 +22,15 @@ public class CopyThread extends Thread
         this.toCopy = toCopy;
         this.ui = ui;
         this.logsList = logsList;
+        File temp = new File(logDest);
+        if(!temp.exists())
+        {
+            try {
+                temp.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void run()

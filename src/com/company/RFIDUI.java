@@ -24,12 +24,15 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
-    final static String logPath = "D:\\logTemp"; //internal storage/emulated/handset/uhf //TODO set for scanner
+    static String logPath = "\\Internal shared storage\\handset\\UHF"; //internal storage/emulated/handset/uhf //TODO set for scanner
+    private String currentScanner;
 
     public RFIDUI(Main main)
     {
         this.main = main;
         MainUISetup();
+
+
     }
 
     private void MainUISetup()
@@ -120,6 +123,7 @@ public class RFIDUI
             newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
                     "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
                     "\n Für mehr Informationen siehe \"Hilfe\".");
+            currentScanner = newestScanner;
         }
         else
         {
@@ -175,6 +179,7 @@ public class RFIDUI
             public void mouseClicked(MouseEvent e)
             {
                 newest = Integer.parseInt(main.getProps().getProperty("count"))-scannerList.getSelectedIndex();
+                currentScanner = main.getProps().getProperty(String.valueOf(newest));
                 if(newest >= 0)
                 {
                     File temp = new File(main.getProps().getProperty(String.valueOf(newest)));
@@ -727,9 +732,9 @@ public class RFIDUI
 
     private DefaultListModel searchButtonClicked(JPanel parent)
     {
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser = new JFileChooser(); //TODO list devices
         chooser.setDialogTitle("Scanner-Pfad auswählen");
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             main.addNewScanner(chooser.getSelectedFile());

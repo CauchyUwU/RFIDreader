@@ -1,8 +1,49 @@
 package com.company;
 
+import jmtp.PortableDevice;
+import jmtp.PortableDeviceManager;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public class ScannerHandler
-{ //a class that contains all the scanner data e.g. name path log path alt log path connection state (called when a new scanner gets connected)
-    //if the scanner is chosen from the scanner list but not connected set connection state false and variables null
-    //public ScannerHandler();
-    //idk if I need this yet...
+{
+    private PortableDeviceManager manager;
+    private ArrayList scannerList;
+
+    private MTPFileManager fileManager;
+
+    public ScannerHandler()
+    {
+        manager = new PortableDeviceManager(); //TODO scannerHandler
+        manager.refreshDeviceList();
+        scannerList.addAll(Arrays.asList(manager.getDevices()));
+    }
+
+    public ArrayList getLogsFromScanner(PortableDevice device)
+    {
+        return null; //TODO
+    }
+
+
+    public ArrayList getScannerList() {
+        return scannerList;
+    }
+
+    public MTPFileManager getFileManager() {
+        return fileManager;
+    }
+
+    public void setFileManager(PortableDevice device) {
+        MTPFileManager fileManager = new MTPFileManager();
+        fileManager.openDevice(device);
+        this.fileManager = fileManager;
+    }
+
+    public void discardFileManager()
+    {
+        PortableDevice device = fileManager.getDevice();
+        device.close();
+        fileManager = null;
+    }
 }
