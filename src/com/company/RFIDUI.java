@@ -1,6 +1,7 @@
 package com.company;
 
 import jmtp.PortableDevice;
+import jmtp.PortableDeviceManager;
 
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
@@ -29,12 +30,13 @@ public class RFIDUI
     private int newest;
     static String logPath = "\\Internal shared storage\\handset\\UHF"; //internal storage/emulated/handset/uhf //TODO set for scanner
     private String currentScanner;
+    ScannerHandler handler;
 
     public RFIDUI(Main main)
     {
         this.main = main;
         MainUISetup();
-
+        handler = new ScannerHandler();
 
     }
 
@@ -185,8 +187,18 @@ public class RFIDUI
                 currentScanner = main.getProps().getProperty(String.valueOf(newest));
                 if(newest >= 0)
                 {
+                    MTPFileManager manager = new MTPFileManager();
+                    PortableDevice[] devices = manager.getDevices();
+                    boolean exists = false;
+                    for(int i = 0; i < devices.length; i++)
+                    {
+                        if(devices[i].getFriendlyName().equals(currentScanner))
+                        {
+                            exists = true;
+                        }
+                    }
                     File temp = new File(main.getProps().getProperty(String.valueOf(newest))); //TODO get device
-                    if(!temp.exists())
+                    if(!exists)
                     {
                         JOptionPane.showMessageDialog(null,
                                 "Der Scanner kann nicht gefunden werden. Kopieren und Löschen von Logs nicht möglich.",
@@ -735,7 +747,6 @@ public class RFIDUI
 
     private DefaultListModel searchButtonClicked(JPanel parent)
     {
-        ScannerHandler handler = new ScannerHandler();
         ArrayList<PortableDevice> scanners = handler.getScannerList();
 
         String[] choices = new String[scanners.size()];
@@ -748,7 +759,7 @@ public class RFIDUI
                 choices, // Array of choices
                 choices[0]); // Initial choice
 
-        if (!input.equals("")) {
+        if (input != null) {
             main.addNewScanner(input);
             System.out.println("getSelectedFile() : "
                     +  input);
