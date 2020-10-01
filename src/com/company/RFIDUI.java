@@ -1,5 +1,7 @@
 package com.company;
 
+import jmtp.PortableDevice;
+
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.Runtime.getRuntime;
 
@@ -182,7 +185,7 @@ public class RFIDUI
                 currentScanner = main.getProps().getProperty(String.valueOf(newest));
                 if(newest >= 0)
                 {
-                    File temp = new File(main.getProps().getProperty(String.valueOf(newest)));
+                    File temp = new File(main.getProps().getProperty(String.valueOf(newest))); //TODO get device
                     if(!temp.exists())
                     {
                         JOptionPane.showMessageDialog(null,
@@ -732,17 +735,26 @@ public class RFIDUI
 
     private DefaultListModel searchButtonClicked(JPanel parent)
     {
-        JFileChooser chooser = new JFileChooser(); //TODO list devices
-        chooser.setDialogTitle("Scanner-Pfad auswählen");
-        //chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);
-        if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            main.addNewScanner(chooser.getSelectedFile());
+        ScannerHandler handler = new ScannerHandler();
+        ArrayList<PortableDevice> scanners = handler.getScannerList();
+
+        String[] choices = new String[scanners.size()];
+        for(int i = 0; i < scanners.size(); i++)
+        {
+            choices[i] = scanners.get(i).getFriendlyName();
+        }
+        String input = (String) JOptionPane.showInputDialog(null, "Scanner zum Hinzufügen auswählen",
+                "Scanner hinzufügen", JOptionPane.PLAIN_MESSAGE, null,
+                choices, // Array of choices
+                choices[0]); // Initial choice
+
+        if (!input.equals("")) {
+            main.addNewScanner(input);
             System.out.println("getSelectedFile() : "
-                    +  chooser.getSelectedFile());
+                    +  input);
         }
         else {
-            System.out.println("No Selection ");
+            System.out.println("No Selection "); //TODO
         }
 
         DefaultListModel model = new DefaultListModel();

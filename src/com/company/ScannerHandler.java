@@ -15,6 +15,7 @@ public class ScannerHandler
 
     public ScannerHandler()
     {
+        scannerList = new ArrayList();
         manager = new PortableDeviceManager(); //TODO scannerHandler
         manager.refreshDeviceList();
         scannerList.addAll(Arrays.asList(manager.getDevices()));
@@ -22,6 +23,8 @@ public class ScannerHandler
 
     public ArrayList getLogsFromScanner(PortableDevice device)
     {
+        discardFileManager();
+        setFileManager(device);
         return null; //TODO
     }
 

@@ -20,7 +20,6 @@ public class DelInsThread extends Thread
     public DelInsThread(ThreadState state, Main main, DefaultListModel model, RFIDUI ui, int i)
     {
         File f = new File(propsPath);
-        System.out.println(f.exists());
         this.state = state;
         this.main = main;
         this.model = model;

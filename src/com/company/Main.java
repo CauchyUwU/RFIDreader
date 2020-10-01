@@ -40,14 +40,15 @@ public class Main {
 
     public static void main(String[] args) {
         Main m = new Main();
+        PortableDeviceManager ma = new PortableDeviceManager();
+        for (PortableDevice d : ma)
+        {
+            d.open();
+            System.out.println(d.getType() + " " + d.getFriendlyName());
+        }
         //m.resetProps();
         m.getPropAsList();
         RFIDUI gui = new RFIDUI(m);
-        /*
-        System.out.println(m.prefs.get("SCANNER", ""));
-        Scanner sc = new Scanner(System.in);
-        m.prefs.put("SCANNER", m.prefs.get("SCANNER", "")+sc.nextLine());
-        System.out.println(m.prefs.get("SCANNER", ""));*/
     }
 
     public ArrayList getPropAsList()
@@ -89,7 +90,7 @@ public class Main {
         }
     }
 
-    public void addNewScanner(File selectedFile)
+    public void addNewScanner(String scanner)
     {
         int count = Integer.parseInt(props.getProperty("count")) + 1;
 
@@ -98,7 +99,7 @@ public class Main {
             props.load(fis);
 
             props.setProperty("count", String.valueOf(count));
-            props.setProperty(String.valueOf(count), selectedFile.toString());
+            props.setProperty(String.valueOf(count), scanner);
 
             FileOutputStream fos = new FileOutputStream(propFileName);
             props.store(fos,null);
