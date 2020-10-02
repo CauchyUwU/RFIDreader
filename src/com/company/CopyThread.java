@@ -1,10 +1,16 @@
 package com.company;
 
+import jmtp.PortableDevice;
+import jmtp.PortableDeviceManager;
+
 import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static com.company.RFIDUI.logPath;
 
 public class CopyThread extends Thread
 {
@@ -12,12 +18,15 @@ public class CopyThread extends Thread
     private ArrayList toCopy;
     private RFIDUI ui;
     private JList logsList;
-    private final static String logDest = "C:\\Users\\lisas\\Desktop\\RFIDreader\\Logs";
+    private final static String logDest = System.getProperty("user.home") + "\\Desktop\\RFIDreader\\Logs\\";
+    private final static String logSource = "Internal shared storage\\handset\\UHF";
+    private String currentScanner;
 
     private InterruptedException interrupted;
 
-    public CopyThread(JProgressBar prog, ArrayList toCopy, RFIDUI ui, JList logsList)
+    public CopyThread(JProgressBar prog, ArrayList toCopy, RFIDUI ui, JList logsList, String scanner)
     {
+        this.currentScanner = scanner;
         this.prog = prog;
         this.toCopy = toCopy;
         this.ui = ui;
@@ -36,21 +45,62 @@ public class CopyThread extends Thread
     public void run()
     {
         int len = toCopy.size();
+
+        try
+        {
+            File temp = new File(logDest);
+            temp.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         for (int i = 0; i < len; i++)
         {
-            File temp = new File(toCopy.get(i).toString());
-            if(temp.exists())
+            String filepath = "\\" + currentScanner + "\\" + logSource + "\\" + toCopy.get(i).toString();
+            File batch = new File(System.getProperty("user.home") + "\\Desktop\\RFIDreader\\copy.bat");
+            batch.delete();
+
+            File batchNew = new File(System.getProperty("user.home") + "\\Desktop\\RFIDreader\\copy.bat"); //TODO change this, doesn't work
+
+            String source = "cd C:\\\\ \n" +
+                    "SET File=" + filepath +"\n" +
+                    "SET Dest=" + logDest +"\n" +
+                    "move %File% %Dest%\n" +
+                    "SET File=\n" +
+                    "pause";
+
+            try {
+                FileWriter f2 = new FileWriter(batchNew, false);
+                f2.write(source);
+                f2.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            boolean exists = false;
+
+            PortableDeviceManager manager = new PortableDeviceManager();
+            for(PortableDevice device : manager)
+            {
+                if(device.getFriendlyName().equals(currentScanner))
+                {
+                    MTPFileManager fileManager = new MTPFileManager();
+                    fileManager.openDevice(device);
+                    if(fileManager.getAllFilesByName(logPath).contains(toCopy.get(i).toString()))
+                    {
+                        exists = true;
+                    }
+                }
+            }
+
+            if(exists)
             {
                 try
                 {
-                    if(temp.renameTo(new File(logDest + "\\" + temp.getName())))
-                    {
-                        temp.delete();
-                    }
-                    else
-                    {
-                        throw new FileNotFoundException();
-                    }
+                    ProcessBuilder pb = new ProcessBuilder("cmd", "/c", System.getProperty("user.home") + "\\Desktop\\RFIDreader\\copy.bat");
+                    pb.directory(new File(System.getProperty("user.home")));
+                    Process p = pb.start();
                 }
                 catch (Exception e)
                 {

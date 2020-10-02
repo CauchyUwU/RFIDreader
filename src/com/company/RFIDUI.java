@@ -28,7 +28,7 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
-    static String logPath = "\\Internal shared storage\\handset\\UHF"; //internal storage/emulated/handset/uhf //TODO set for scanner
+    static String logPath = "Internal shared storage\\handset\\UHF"; //internal storage/emulated/handset/uhf //TODO set for scanner
     private String currentScanner;
     ScannerHandler handler;
 
@@ -529,16 +529,21 @@ public class RFIDUI
         labelList.setBackground(veryLightGrey);
         labelList.setEditable(false);
 
-        ArrayList logs;
-        File tempFolder = new File(logPath);
-        if(tempFolder.exists())
+
+        ArrayList logs = new ArrayList(Arrays.asList("Log-Ordner nicht gefunden"));
+
+        PortableDeviceManager manager = new PortableDeviceManager();
+        for(PortableDevice device : manager)
         {
-            logs = new ArrayList(Arrays.asList(tempFolder.listFiles()));
+            if(device.getFriendlyName().equals(currentScanner))
+            {
+                MTPFileManager fileManager = new MTPFileManager();
+                fileManager.openDevice(device);
+                logs.clear();
+                logs.addAll(0, fileManager.getAllFilesByName(logPath));
+            }
         }
-        else
-        {
-            logs = new ArrayList(Arrays.asList("Log-Ordner nicht gefunden"));
-        }
+
         JList logsList = new JList(logs.toArray());
         logsList.setFixedCellHeight(25);
         logsList.setFixedCellWidth(480);
@@ -604,7 +609,16 @@ public class RFIDUI
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    if(tempFolder.exists())
+                    PortableDeviceManager manager = new PortableDeviceManager();
+                    boolean exists = false;
+                    for(PortableDevice device : manager)
+                    {
+                        if(device.getFriendlyName().equals(currentScanner))
+                        {
+                            exists = true;
+                        }
+                    }
+                    if(exists)
                     {
                         copy(progBar, new ArrayList(logsList.getSelectedValuesList()), logsList);
                     }
@@ -621,7 +635,16 @@ public class RFIDUI
                 @Override
                 public void mouseClicked(MouseEvent e)
                 {
-                    if(tempFolder.exists())
+                    PortableDeviceManager manager = new PortableDeviceManager();
+                    boolean exists = false;
+                    for(PortableDevice device : manager)
+                    {
+                        if(device.getFriendlyName().equals(currentScanner))
+                        {
+                            exists = true;
+                        }
+                    }
+                    if(exists)
                     {
                         ArrayList temp = new ArrayList();
                         for(int i = 0; i < logsList.getModel().getSize(); i++)
@@ -673,7 +696,7 @@ public class RFIDUI
     private void copy(JProgressBar prog, ArrayList toCopy, JList logsList)
     {
         prog.setValue(0);
-        CopyThread copyThread = new CopyThread(prog, toCopy, this, logsList);
+        CopyThread copyThread = new CopyThread(prog, toCopy, this, logsList, currentScanner);
         copyThread.start();
     }
 
@@ -689,12 +712,20 @@ public class RFIDUI
                 options[0]);
         prog.setValue(0);
 
-        ArrayList logs;
-        File tempFolder = new File(logPath);
-
         DefaultListModel model = new DefaultListModel();
         ArrayList list = new ArrayList();
-        list.addAll(Arrays.asList(tempFolder.listFiles()));
+        PortableDeviceManager manager = new PortableDeviceManager();
+        for(PortableDevice device : manager)
+        {
+            if(device.getFriendlyName().equals(currentScanner))
+            {
+                MTPFileManager fileManager = new MTPFileManager();
+                fileManager.openDevice(device);
+                list.clear();
+                list.addAll(0, fileManager.getAllFilesByName(logPath));
+            }
+        }
+
         model.addAll(list);
         logsList.setModel(model);
         Object[] data = new Object[logsList.getModel().getSize()];
