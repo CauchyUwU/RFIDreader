@@ -62,7 +62,7 @@ public class CopyThread extends Thread
 
             File batchNew = new File(System.getProperty("user.home") + "\\Desktop\\RFIDreader\\copy.bat"); //TODO change this, doesn't work
 
-            String source = "cd C:\\\\ \n" +
+            String source = "cd C:\\ \n" +
                     "SET File=" + filepath +"\n" +
                     "SET Dest=" + logDest +"\n" +
                     "move %File% %Dest%\n" +
