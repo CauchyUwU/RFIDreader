@@ -74,7 +74,6 @@ public class RFIDUI
                 {
                     case 0:
                         cl.show(cards, NEWSCAN);
-                        System.out.println(0);
                         break;
                     case 1:
                         cl.removeLayoutComponent(card1);

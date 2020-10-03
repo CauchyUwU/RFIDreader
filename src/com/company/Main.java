@@ -4,6 +4,9 @@ import jmtp.PortableDevice;
 import jmtp.PortableDeviceManager;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -32,7 +35,7 @@ public class Main {
         }
         catch (Exception e)
         {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -42,9 +45,7 @@ public class Main {
         for (PortableDevice d : ma)
         {
             d.open();
-            System.out.println(d.getType() + " " + d.getFriendlyName());
         }
-        //m.resetProps();
         m.getPropAsList();
         RFIDUI gui = new RFIDUI(m);
     }
@@ -81,10 +82,9 @@ public class Main {
 
             FileOutputStream fos = new FileOutputStream(file);
             props.store(fos,null);
-            System.out.println("SUCCESS");
         }
         catch(Exception e) {
-            System.out.println("FAILED");
+            e.printStackTrace();
         }
     }
 
@@ -93,6 +93,11 @@ public class Main {
         int count = Integer.parseInt(props.getProperty("count")) + 1;
 
         try {
+            File temp = new File(propFileName);
+            if (temp.isHidden()) {
+                Files.setAttribute(Path.of(propFileName), "dos:hidden", Boolean.FALSE, LinkOption.NOFOLLOW_LINKS);
+            }
+
             FileInputStream fis = new FileInputStream(propFileName);
             props.load(fis);
 
@@ -101,12 +106,12 @@ public class Main {
 
             FileOutputStream fos = new FileOutputStream(propFileName);
             props.store(fos,null);
-            System.out.println("SUCCESS");
             fis.close();
             fos.close();
+            Files.setAttribute(Path.of(propFileName), "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS);
         }
         catch(Exception e) {
-            System.out.println("FAILED");
+            e.printStackTrace();
         }
     }
 }
