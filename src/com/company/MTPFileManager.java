@@ -162,7 +162,7 @@ public class MTPFileManager {
         PortableDeviceFolderObject folder = MTPUtil.createFolder(path, storage, null, lastpartofpath);
 
         for (PortableDeviceObject fileObject : folder.getChildObjects()) {
-            if (fileObject != null) {
+            if (fileObject != null && fileObject.getOriginalFileName().endsWith(".xls")) {
                 fileNames.add(fileObject.getOriginalFileName());
             }
         }
@@ -176,7 +176,7 @@ public class MTPFileManager {
         return manager.getDevices();
     }
 
-    private PortableDeviceStorageObject getStorage() {
+    PortableDeviceStorageObject getStorage() {
 
         if (device.getRootObjects() != null) {
 

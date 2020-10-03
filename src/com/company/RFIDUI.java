@@ -28,7 +28,7 @@ public class RFIDUI
     final static String HELP = "Hilfe";
     private Color veryLightGrey = new Color(238,238,238);
     private int newest;
-    static String logPath = "Internal shared storage\\handset\\UHF"; //internal storage/emulated/handset/uhf //TODO set for scanner
+    static String logPath = "Internal shared storage\\handset\\UHF";
     private String currentScanner;
     ScannerHandler handler;
 
@@ -197,7 +197,6 @@ public class RFIDUI
                             exists = true;
                         }
                     }
-                    File temp = new File(main.getProps().getProperty(String.valueOf(newest))); //TODO get device
                     if(!exists)
                     {
                         JOptionPane.showMessageDialog(null,
@@ -540,7 +539,7 @@ public class RFIDUI
                 MTPFileManager fileManager = new MTPFileManager();
                 fileManager.openDevice(device);
                 logs.clear();
-                logs.addAll(0, fileManager.getAllFilesByName(logPath));
+                logs.addAll(0, fileManager.getAllFilesByName(logPath)); //TODO no folder
             }
         }
 
@@ -722,7 +721,7 @@ public class RFIDUI
                 MTPFileManager fileManager = new MTPFileManager();
                 fileManager.openDevice(device);
                 list.clear();
-                list.addAll(0, fileManager.getAllFilesByName(logPath));
+                list.addAll(0, fileManager.getAllFilesByName(logPath)); //TODO no folder
             }
         }
 
@@ -792,11 +791,6 @@ public class RFIDUI
 
         if (input != null) {
             main.addNewScanner(input);
-            System.out.println("getSelectedFile() : "
-                    +  input);
-        }
-        else {
-            System.out.println("No Selection "); //TODO
         }
 
         DefaultListModel model = new DefaultListModel();
