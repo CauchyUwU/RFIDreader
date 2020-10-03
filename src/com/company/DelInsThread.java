@@ -2,6 +2,9 @@ package com.company;
 
 import javax.swing.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -43,6 +46,13 @@ public class DelInsThread extends Thread
     synchronized void delete() {
         try {
             Properties props = main.getProps();
+
+            File temp = new File(propsPath);
+            if(temp.isHidden())
+            {
+                Files.setAttribute(Path.of(propsPath), "dos:hidden", Boolean.FALSE, LinkOption.NOFOLLOW_LINKS);
+            }
+
             InputStream in = new FileInputStream(propsPath);
             props.load(in);
             props.remove(String.valueOf(index));
@@ -52,10 +62,15 @@ public class DelInsThread extends Thread
             }
             props.remove(String.valueOf(Integer.parseInt(props.getProperty("count"))));
             props.setProperty("count", String.valueOf(Integer.parseInt(props.getProperty("count"))-1));
+            if(Integer.parseInt(props.getProperty("count")) < 0)
+            {
+                props.setProperty("count", String.valueOf(-1));
+            }
             OutputStream out = new FileOutputStream(propsPath);
             props.store(out, null);
             in.close();
             out.close();
+            Files.setAttribute(Path.of(propsPath), "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,7 +80,18 @@ public class DelInsThread extends Thread
 
     synchronized void copy()
     {
-        ret.addAll(main.getPropAsList());
+        try {
+            File temp = new File(propsPath);
+            if (temp.isHidden()) {
+                Files.setAttribute(Path.of(propsPath), "dos:hidden", Boolean.FALSE, LinkOption.NOFOLLOW_LINKS);
+            }
+            ret.addAll(main.getPropAsList());
+            Files.setAttribute(Path.of(propsPath), "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized DefaultListModel getRet() {

@@ -28,8 +28,6 @@ public class Main {
             inputStream = new FileInputStream(temp);
             if (inputStream != null) {
                 props.load(inputStream);
-            } else {
-                System.out.println("null");
             }
         }
         catch (Exception e)
