@@ -3,6 +3,7 @@ package com.company;
 import jmtp.PortableDevice;
 import jmtp.PortableDeviceManager;
 
+import javax.sound.sampled.Port;
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -297,10 +298,20 @@ public class RFIDUI
                 }
                 scannerListClose.setListData(panels);
                 String text = scannerList.getModel().getElementAt(0).toString();
-                String newestScanner = text;
-                newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
-                        "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                        "\n Für mehr Informationen siehe \"Hilfe\".");
+                try
+                {
+                    String newestScanner = text;
+                    newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                }
+                catch (ArrayIndexOutOfBoundsException ex)
+                {
+                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. " +
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
+                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                }
+
             }
         });
 
@@ -776,19 +787,27 @@ public class RFIDUI
 
     private DefaultListModel searchButtonClicked(JPanel parent)
     {
-        ArrayList<PortableDevice> scanners = handler.getScannerList();
+        ArrayList<PortableDevice> scannerList = new ArrayList();
+        PortableDeviceManager manager = new PortableDeviceManager(); //TODO scannerHandler
+        manager.refreshDeviceList();
+        scannerList.addAll(Arrays.asList(manager.getDevices()));
 
-        String[] choices = new String[scanners.size()];
-        for(int i = 0; i < scanners.size(); i++)
+        String[] choices = new String[scannerList.size()];
+        for(int i = 0; i < scannerList.size(); i++)
         {
-            choices[i] = scanners.get(i).getFriendlyName();
+            choices[i] = scannerList.get(i).getFriendlyName();
+        }
+        if(choices.length<=0)
+        {
+            choices = new String[1];
+            choices[0] = "Kein Scanner bekannt";
         }
         String input = (String) JOptionPane.showInputDialog(null, "Scanner zum Hinzufügen auswählen",
                 "Scanner hinzufügen", JOptionPane.PLAIN_MESSAGE, null,
                 choices, // Array of choices
                 choices[0]); // Initial choice
 
-        if (input != null) {
+        if (input != null && !input.equals("Kein Scanner bekannt")) {
             main.addNewScanner(input);
         }
 
