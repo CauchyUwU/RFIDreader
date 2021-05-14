@@ -55,14 +55,14 @@ public class RFIDUI
         cards.add(card1, SYNCDELPART);
         JPanel card2 = syncDel(true);
         cards.add(card2, SYNCDEL);
-        JPanel card3 = help();
-        cards.add(card3, HELP);
+        //JPanel card3 = help();
+        //cards.add(card3, HELP);
 
         frame.getContentPane().add(cards, BorderLayout.CENTER); //add return to frame
         CardLayout cl = (CardLayout)(cards.getLayout());
         cl.show(cards, NEWSCAN);
 
-        String[] options = {"Neuen Scanner einrichten", "Ausgewählte Logs übertragen", "Alle Logs übertragen", "Hilfe"};
+        String[] options = {"Neuen Scanner einrichten", "Ausgewählte Logs übertragen", "Alle Logs übertragen"};
         JList optionsList = new JList(options);
         optionsList.setFixedCellHeight(40);
         optionsList.setCellRenderer(getRenderer());
@@ -88,9 +88,9 @@ public class RFIDUI
                         cards.add(card2, SYNCDEL);
                         cl.show(cards, SYNCDEL);
                         break;
-                    case 3:
+                    /*case 3:
                         cl.show(cards, HELP);
-                        break;
+                        break;*/
                     default:
                         cl.show(cards, NEWSCAN);
                         break;
@@ -126,14 +126,12 @@ public class RFIDUI
         {
             String newestScanner = main.getProps().getProperty(String.valueOf(newest));
             newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
-                    "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                    "\n Für mehr Informationen siehe \"Hilfe\".");
+                    "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
             currentScanner = newestScanner;
         }
         else
         {
-            newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                    "\n Für mehr Informationen siehe \"Hilfe\".");
+            newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
         }
         newestScannerText.setEditable(false);
         //newestScannerText.setSize(490, 90);
@@ -208,14 +206,12 @@ public class RFIDUI
                         String text = scannerList.getModel().getElementAt(0).toString();
                         String newestScanner = main.getProps().getProperty(String.valueOf(newest));
                         newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
-                                "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                                "\n Für mehr Informationen siehe \"Hilfe\".");
+                                "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                     }
                 }
                 else
                 {
-                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                 }
 
             }
@@ -266,13 +262,11 @@ public class RFIDUI
                 {
                     String newestScanner = main.getProps().getProperty(String.valueOf(newest));
                     newestScannerText.setText("Der letzte verbundene Scanner war "+ newestScanner + ". " +
-                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                 }
                 else
                 {
-                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                    newestScannerText.setText("Aktuell ist kein Scanner bekannt. Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                 }
             }
         });
@@ -297,19 +291,17 @@ public class RFIDUI
                     panels[i] = closePanel;
                 }
                 scannerListClose.setListData(panels);
-                String text = scannerList.getModel().getElementAt(0).toString();
                 try
                 {
+                    String text = scannerList.getModel().getElementAt(0).toString();
                     String newestScanner = text;
                     newestScannerText.setText("Der letzte verbundene Scanner war " + newestScanner + ". " +
-                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                 }
                 catch (ArrayIndexOutOfBoundsException ex)
                 {
                     newestScannerText.setText("Aktuell ist kein Scanner bekannt. " +
-                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\"." +
-                            "\n Für mehr Informationen siehe \"Hilfe\".");
+                            "\n Um einen neuen Scanner hinzuzufügen, klicken Sie auf \"Durchsuchen\".");
                 }
 
             }

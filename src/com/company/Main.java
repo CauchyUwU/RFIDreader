@@ -41,6 +41,7 @@ public class Main {
 
     public static void main(String[] args) {
         Main m = new Main();
+        System.load(System.getProperty("user.home")+"\\Desktop\\RFIDreader\\jmtp64.dll");
         PortableDeviceManager ma = new PortableDeviceManager();
         for (PortableDevice d : ma)
         {
